@@ -14,10 +14,19 @@
 
 ### Prerequisites
 
+    This study is done on CMSSW_8_0_26_patch1.
+
+    You will also need a set of root files which contain the folowing features:
+        1) Produced in the range of 0 < |eta| < 2.5, flat probability
+        2) Stored information of PCaloHit depths
+        3) (optional, but necessary to reproduce results from AN-18-079) Electron and photon particle gun samples with fixed Pt at 60 GeV. With optional productions at 30, 45, and 120 GeV.
+
 ### Installing
 
 ## Running the Ntuplizer
-
+    
+    Condor was used as the batch submission program. The file condor_filelist.perl was used to submit the particle gun samples to condor for analysis. Please refer to condor_filelist_instructions.txt for how to use it, or if you're comfortable reading perl go explore it yourself. 
+    
 ## Running the Producer
 
 ## Adding New Models
