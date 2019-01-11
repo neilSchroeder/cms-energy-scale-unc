@@ -1,7 +1,9 @@
 # CMS: Systematic Uncertainty on the Photon Energy Scale
 
- This documentation contains the following: //
+ This documentation contains the following:
+
     1) An analyzer containing a framework which will produce the ntuples required to produce the systematic uncertainty on the photon energy scale.
+
     2) A set of files which will produce the relevant plots and text files containing the systematic uncertainties on the photon energy scale.
 
  This documentation does not contain:
