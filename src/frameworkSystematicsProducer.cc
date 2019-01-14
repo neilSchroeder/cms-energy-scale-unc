@@ -126,25 +126,25 @@ void mySystematicsProducer::produce_LookUpTables(std::string fileName){
 
     std::cout << "evaluating systematics ... " << std::endl;
 
-    std::string uncertainty_low = "uncertainty_hists_low.root";
-    std::string uncertainty_high = "uncertainty_hists_high.root";
-    std::string uncertainty_frontDown = "uncertainty_hists_frontFlat.root";
+    std::string uncertainty_low = "rootFiles/uncertainty_hists_low.root";
+    std::string uncertainty_high = "rootFiles/uncertainty_hists_high.root";
+    std::string uncertainty_frontDown = "rootFiles/uncertainty_hists_frontFlat.root";
 
 
     if(fileName.find("030") != std::string::npos){
-        uncertainty_low = "uncertainty_hists_low_030.root";
-        uncertainty_high = "uncertainty_hists_high_030.root";
-        uncertainty_frontDown = "uncertainty_hists_frontFlat_030.root";
+        uncertainty_low = "rootFiles/uncertainty_hists_low_030.root";
+        uncertainty_high = "rootFiles/uncertainty_hists_high_030.root";
+        uncertainty_frontDown = "rootFiles/uncertainty_hists_frontFlat_030.root";
     }
     if(fileName.find("045") != std::string::npos){
-        uncertainty_low = "uncertainty_hists_low_045.root";
-        uncertainty_high = "uncertainty_hists_high_045.root";
-        uncertainty_frontDown = "uncertainty_hists_frontFlat_045.root";
+        uncertainty_low = "rootFiles/uncertainty_hists_low_045.root";
+        uncertainty_high = "rootFiles/uncertainty_hists_high_045.root";
+        uncertainty_frontDown = "rootFiles/uncertainty_hists_frontFlat_045.root";
     }
     if(fileName.find("120") != std::string::npos){
-        uncertainty_low = "uncertainty_hists_low_120.root";
-        uncertainty_high = "uncertainty_hists_high_120.root";
-        uncertainty_frontDown = "uncertainty_hists_frontFlat_120.root";
+        uncertainty_low = "rootFiles/uncertainty_hists_low_120.root";
+        uncertainty_high = "rootFiles/uncertainty_hists_high_120.root";
+        uncertainty_frontDown = "rootFiles/uncertainty_hists_frontFlat_120.root";
     }
 
     TFile * correction_low = new TFile(uncertainty_low.c_str(), "READ");
