@@ -22,11 +22,29 @@
         3) (optional, but necessary to reproduce results from AN-18-079) Electron and photon particle gun samples with fixed Pt at 60 GeV. With optional productions at 30, 45, and 120 GeV.
 
 ### Installing
+    
+    From your preference of work area, run the following commands:
+
+    cmsrel CMSSW_8_0_26_patch1
+    cd CMSSW_8_0_26_patch1/src/
+    cmsenv
+    git cms-init
+    git clone git@github.com:neilSchroeder/cms-photon-energy-scale-unc.git photonEnScaleUnc
+    cd photonEnScaleUnc
+    scram b -j 4
+    make
 
 ## Running the Ntuplizer
     
-    Condor was used as the batch submission program. The file condor_filelist.perl was used to submit the particle gun samples to condor for analysis. Please refer to condor_filelist_instructions.txt for how to use it, or if you're comfortable reading perl go explore it yourself. 
+    The ntuplizer used to produce the necessary trees is included in this repository. Simply submit your particle gun samples, with PCaloHit depth information stored, to be analyzed using the edmAnalyzer provided. 
     
 ## Running the Producer
+
+    Once the ntuples have been produced run the follwing command to generate a text file with a list of all the root files with their full path names, replacing myDirectory with the path to the directory where the root files are stored:
+
+    ls -1 myElectronDirectory/*.root >> rootFilesElectronList.txt
+    ls -1 myPhotonDirectory/*.root >> rootFilesPhotonList.txt
+
+    These text files will be supplied to the producer in order to make the histograms and plots of the systematic uncertainty on the photon energy scale.
 
 ## Adding New Models
