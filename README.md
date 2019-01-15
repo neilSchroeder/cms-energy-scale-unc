@@ -16,18 +16,18 @@ Code for obtaining the systematic uncertainty on the photon energy scale using t
 
 ----
 
-Getting Started
+##Getting Started
 
 ----
 
 Prerequisites
 
-    This study is done on CMSSW_8_0_26_patch1.
+----
 
-    You will also need a set of root files which contain the folowing features:
-        1) Electron and photon particle gun samples. To reproduce results from AN-18-079 the particle gun samples should be produced with fixed Pt at 60 GeV.
-        2) Produced in the range of 0 < |eta| < 2.5, flat probability
-        3) Stored information of PCaloHit depths
+You will also need a set of root files which contain the folowing features:
+ 1) Electron and photon particle gun samples. To reproduce results from AN-18-079 the particle gun samples should be produced with fixed Pt at 60 GeV.
+ 2) Produced in the range of 0 < |eta| < 2.5, flat probability
+ 3) Stored information of PCaloHit depths
 
 ----
 
