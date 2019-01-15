@@ -26,17 +26,42 @@
 #include "../interface/frameworkHistogramProducer.h"
 #include "../interface/frameworkSystematicsProducer.h"
 #include "../interface/frameworkSystematicsPlotter.h"
+#include <boost/program_options.hpp>
+#include <iostream>
 
 int main( int argc, char **argv ){
+    using namespace boost;
+    namespace opts = boost::program_options;
+
+    std::string eleInputFile;
+    std::string phoInputFile;
+    std::string rootFileOut;
+    std::string outDir;
+
+    opts::options_description desc("Main Options");
+    
+    desc.add_options()
+        ("eleInputFile", opts::value<std::string>(&eleInputFile), "Electron Input File")
+        ("phoInputFile", opts::value<std::string>(&phoInputFile), "Photon Input File")
+        ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output Root File Name")
+        ("outDir", opts::value<std::string>(&outDir), "Output Directory")
+    ;
+
+    opts::variables_map v_map;
+    opts::store(opts::parse_command_line(argc, argv, desc), v_map);
+    opts::notify(v_map);
     
     myHistogramProducer hist_producer;
     mySystematicsProducer syst_producer;
     mySystematicsPlotter syst_plotter;
 
-    std::string thisRootFile = hist_producer.produce_FNUF_Histograms(argv, 1);
+    hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
 
-    syst_producer.produce_LookUpTables(thisRootFile);
-    syst_plotter.produce_2016_2017_Plots(thisRootFile);
+    rootFileOut = outDir+rootFileOut;
+    if(rootFileOut.find(".root") == std::string::npos) rootFileOut = rootFileOut+".root";
+
+    syst_producer.produce_LookUpTables(rootFileOut);
+    syst_plotter.produce_2016_2017_Plots(rootFileOut);
 
     return 0;
 }

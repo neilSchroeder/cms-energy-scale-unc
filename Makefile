@@ -1,4 +1,4 @@
-CFLAGS = -pthread -m64 -lstdc++fs -Wno-deprecated
+CFLAGS = -pthread -m64 -lstdc++fs -Wno-deprecated -lboost_program_options
 CFLAGS += $(shell root-config --cflags --libs)
 
 all: Check 

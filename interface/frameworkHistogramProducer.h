@@ -6,5 +6,5 @@
 class myHistogramProducer{
 
     public:
-        std::string produce_FNUF_Histograms( char **, int);
+        void produce_FNUF_Histograms( std::string, std::string, std::string, std::string);
 };

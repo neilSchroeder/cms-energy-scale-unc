@@ -29,7 +29,7 @@
 #include <TLatex.h>
 #include <TPaletteAxis.h>
 #include <TStyle.h>
-#include <TTree.h>
+#include <TTree.h> 
 #include "../interface/frameworkHistogramProducer.h"
 
 //#define ETA_VETO
@@ -37,10 +37,10 @@
 std::string DIRECTORY_NAME = "photonSystematics";
 
 /// Produce FNUF Histograms only analyzes two files at a time
-std::string myHistogramProducer::produce_FNUF_Histograms( char ** cLineArgs, int i ){
+void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::string pho_file, std::string outputFileName, std::string outputDirectoryName){
     std::string ret = "";
 
-    std::cout << "File to analyze: " << cLineArgs[i] << " and " << cLineArgs[i+1] << std::endl;
+    std::cout << "Electron File: " << ele_file << "\nPhoton File: " << pho_file << std::endl;
 
 	//declare some constants
 	int numR9bins = 5;
@@ -181,8 +181,7 @@ std::string myHistogramProducer::produce_FNUF_Histograms( char ** cLineArgs, int
 
 	//File stuffs
     std::ifstream in;
-	const char * thisFile = cLineArgs[i];
-	in.open( thisFile );
+	in.open( ele_file.c_str() );
 
     std::string rootFile;
 	bool noVeto = true;
@@ -353,15 +352,14 @@ std::string myHistogramProducer::produce_FNUF_Histograms( char ** cLineArgs, int
             }//end while keys
         }//end if not zombie
         else{
-            std::cout << "The file " << thisFile << " did not open properly" << std::endl;
+            std::cout << "The file " << ele_file << " did not open properly" << std::endl;
             std::cout << "... continuing without this file." << std::endl;
         }
         myFile->Close();
     }//end while files in
 	
 	in.close();
-	thisFile = cLineArgs[i+1];
-	in.open( thisFile );
+	in.open( pho_file.c_str() );
 
 	// this loop will be the photon loop
     while( in >> rootFile){
@@ -493,25 +491,25 @@ std::string myHistogramProducer::produce_FNUF_Histograms( char ** cLineArgs, int
             }//end while keys
         }//end if is zombie
         else{
-            std::cout << "The file " << thisFile << " did not open correctly" << std::endl;
+            std::cout << "The file " << pho_file << " did not open correctly" << std::endl;
             std::cout << "... continuing without this file." << std::endl;
         }
         myFile->Close();
     }//end while files in
 	
 	in.close();
-    std::string inputFileName = std::string(cLineArgs[i]);
-    std::size_t extension_location = inputFileName.find(".");
-    inputFileName = inputFileName.substr(1, extension_location-1);
 
     // manage output directory
     //
-    DIRECTORY_NAME = "photonSystematics_"+inputFileName;
+    DIRECTORY_NAME = outputDirectoryName;
     
-    system(std::string("source clean_up_directories.sh "+DIRECTORY_NAME).c_str());
+    
+    system(std::string("source ./clean_up_directories.sh "+DIRECTORY_NAME).c_str());
+    std::cout << "source ./clean_up_directories.sh "+DIRECTORY_NAME << std::endl;
     //////////////////////////////////////////////////////
     
-    std::string fileOut = DIRECTORY_NAME+"/photonSystematics_Histograms_"+inputFileName+".root";
+    std::string fileOut = DIRECTORY_NAME+outputFileName;
+    if(fileOut.find(".root") == std::string::npos) fileOut = fileOut+".root";
 
 
     std::cout<< "files successfully analyzed... " << std::endl;
@@ -519,9 +517,7 @@ std::string myHistogramProducer::produce_FNUF_Histograms( char ** cLineArgs, int
 
 	//////////////////////////////////////////////////////
 
-	thisFile = fileOut.c_str();
-	
-	TFile * out = new TFile(thisFile, "RECREATE");
+	TFile * out = new TFile(fileOut.c_str(), "RECREATE");
 	out->cd();
     for(int i = 0; i < numEtaBins; i++){
         for(int j = 0; j < apdBins; j++){
@@ -554,8 +550,7 @@ std::string myHistogramProducer::produce_FNUF_Histograms( char ** cLineArgs, int
         }
     }
     std::cout << "finished writing to file... " << std::endl;
-    ret = fileOut;
-	return ret;
+	return;
 };
 
 #endif

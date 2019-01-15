@@ -1,9 +1,6 @@
-CMS: Systematic Uncertainty on the Photon Energy Scale
-----
+#CMS: Systematic Uncertainty on the Photon Energy Scale
 
 Code for obtaining the systematic uncertainty on the photon energy scale using the method outlined in AN-18-079.
-
-----
 
  This documentation contains the following:
 
