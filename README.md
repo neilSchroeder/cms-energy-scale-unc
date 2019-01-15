@@ -50,6 +50,19 @@ Once the ntuples have been produced run the follwing command to generate a text 
 
 These text files will be supplied to the producer in order to make the histograms and plots of the systematic uncertainty on the photon energy scale.
 
+### Arguments for src/producer_photonSystematics
+
+When it comes time to run the producer there will be 4 arguments passed to the producer:
+ 1) --eleInputFile: this will be the file rootFilesElectronList.txt which you created earlier.
+ 2) --phoInputFile: this will be the file rootFilesPhotonList.txt which you created earlier.
+ 3) --rootFileOut: this is the name of the root file containing all the intermediary histograms. You may choose the name for this file. There is protection built into the framework on the off chance you do not include the ".root" at the end of the file name. If you forget to include it, do not interrupt the program as it will be able to handle this.
+ 4) --outDir: this is the name of the directory you wish to have everything written to. The name should be unique as it will be created along-side the folders in this repository.
+
+You should now be ready to run the producer. It should be run from the photonEnScaleUnc/ folder and an example is given below:
+
+   src/producer_PhotonSystematics --eleInputFile="rootFilesElectronList.txt" --phoInputFile="rootFilesPhotonList.txt" --rootFileOut="myOutputRootFile" --outDir="./my_results/" 
+
+This will take on the order of 5 minutes to run depending mostly on how many root files you have chosen to loop over.
 
 ## Adding New Models
 
