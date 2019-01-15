@@ -14,26 +14,20 @@ Code for obtaining the systematic uncertainty on the photon energy scale using t
  1) The edits to the CMSSW code which will store the energy deposits at every depth location within a crystal, although this should now be an option that can just be turned on.
  2) The particle gun code which describes the fixed pt particle gun specifications
 
-----
 
 ##Getting Started
 
-----
 
-Prerequisites
-
-----
+###Prerequisites
 
 You will also need a set of root files which contain the folowing features:
  1) Electron and photon particle gun samples. To reproduce results from AN-18-079 the particle gun samples should be produced with fixed Pt at 60 GeV.
  2) Produced in the range of 0 < |eta| < 2.5, flat probability
  3) Stored information of PCaloHit depths
 
-----
 
-Installing
+###Installing
 
-----
 
 From your preference of work area, run the following commands:
 
@@ -48,19 +42,12 @@ From your preference of work area, run the following commands:
     make
 ```
 
-----
 
-Running the Ntuplizer
-
-----
+##Running the Ntuplizer
 
 The ntuplizer used to produce the necessary trees is included in this repository. Simply submit your particle gun samples, with PCaloHit depth information stored, to be analyzed using the edmAnalyzer provided. It is suggested to use some kind of batch submission as the analyzer can take some time to sort through all the sim hits.
 
-----
-    
-Running the Producer
-
-----
+##Running the Producer
 
 Once the ntuples have been produced run the follwing command to generate a text file with a list of all the root files with their full path names, replacing myDirectory with the path to the directory where the root files are stored:
 
@@ -71,10 +58,7 @@ Once the ntuples have been produced run the follwing command to generate a text 
 
 These text files will be supplied to the producer in order to make the histograms and plots of the systematic uncertainty on the photon energy scale.
 
-----
 
-Adding New Models
-
-----
+##Adding New Models
 
 The instructions for this are in progress.
