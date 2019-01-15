@@ -60,11 +60,9 @@ Running the Ntuplizer
 
 ----
     
- Running the Producer
+Running the Producer
 
-    Once the ntuples have been produced run the follwing command to generate a text file with a list of all the root files 
-    with their full path names, replacing myDirectory with the path to the directory where the root files
-    are stored:
+Once the ntuples have been produced run the follwing command to generate a text file with a list of all the root files with their full path names, replacing myDirectory with the path to the directory where the root files are stored:
 
     ls -1 myElectronDirectory/*.root >> rootFilesElectronList.txt
     ls -1 myPhotonDirectory/*.root >> rootFilesPhotonList.txt
