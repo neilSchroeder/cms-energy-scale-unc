@@ -35,7 +35,6 @@
     make
 
 ## Running the Ntuplizer
-    
     The ntuplizer used to produce the necessary trees is included in this repository. Simply submit your particle gun samples, with PCaloHit depth information stored, to be analyzed using the edmAnalyzer provided. 
     
 ## Running the Producer
