@@ -54,18 +54,25 @@ Running the Ntuplizer
 
 ----
 
-    The ntuplizer used to produce the necessary trees is included in this repository. Simply submit your particle gun samples, with PCaloHit depth information stored, to be analyzed using the edmAnalyzer provided. 
+    The ntuplizer used to produce the necessary trees is included in this
+    repository. Simply submit your particle gun samples, with PCaloHit depth
+    information stored, to be analyzed using the edmAnalyzer provided. 
 
 ----
     
  Running the Producer
 
-    Once the ntuples have been produced run the follwing command to generate a text file with a list of all the root files with their full path names, replacing myDirectory with the path to the directory where the root files are stored:
+    Once the ntuples have been produced run the follwing command to generate 
+    a text file with a list of all the root files with their full path names,
+    replacing myDirectory with the path to the directory where the root files
+    are stored:
 
     ls -1 myElectronDirectory/*.root >> rootFilesElectronList.txt
     ls -1 myPhotonDirectory/*.root >> rootFilesPhotonList.txt
 
-    These text files will be supplied to the producer in order to make the histograms and plots of the systematic uncertainty on the photon energy scale.
+    These text files will be supplied to the producer in order to make the
+    histograms and plots of the systematic uncertainty on the photon energy
+    scale.
 
 ----
 
