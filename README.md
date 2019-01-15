@@ -60,7 +60,9 @@ When it comes time to run the producer there will be 4 arguments passed to the p
 
 You should now be ready to run the producer. It should be run from the photonEnScaleUnc/ folder and an example is given below:
 
+```
    src/producer_PhotonSystematics --eleInputFile="rootFilesElectronList.txt" --phoInputFile="rootFilesPhotonList.txt" --rootFileOut="myOutputRootFile" --outDir="./my_results/" 
+```
 
 This will take on the order of 5 minutes to run depending mostly on how many root files you have chosen to loop over.
 
