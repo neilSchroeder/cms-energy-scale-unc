@@ -68,4 +68,12 @@ This will take on the order of 5 minutes to run depending mostly on how many roo
 
 ## Adding New Models
 
-The instructions for this are in progress.
+The light collection efficiency (LCE) model used in this code is described in detail in AN-18-079 and accounts for loss of transparency in ECAL crystals as a results of radiation damage. Should a new model become available, this framework can be altered to accomodate such an update.
+
+### Adding the Model
+
+The first to alter the framework is to navigate to the ntuples/plugins/ folder and the `models.h` file to add the function as a new public member of the class `models`. Then once added to header file, the functional form of the model should be added to `models.cc`.
+
+### Implementing the Model
+
+Now that the model is a part of the framework it must be implemented in 
