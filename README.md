@@ -76,4 +76,16 @@ The first to alter the framework is to navigate to the ntuples/plugins/ folder a
 
 ### Implementing the Model
 
-Now that the model is a part of the framework it must be implemented in 
+Now that the model is a part of the framework it must be implemented in the `ntuples.cc`. Replace line 79 of ntuples.cc which should read:
+
+```
+    auto thisModel = models::LightCollectionEfficiencyWeighted
+```
+
+with the name of the new model added. For example if the new model you've implemented is named `NewFancierModel` then this line should read:
+
+```
+    auto thisModel = models::NewFancierModel
+```
+
+Once this is changed, simply repeat the analysis and expect that some minor changes may need to be made to the framework to get the plotting to come out nicely.
