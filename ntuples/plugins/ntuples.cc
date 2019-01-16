@@ -76,6 +76,7 @@ Implementation:
 
 //#define Debug
 
+auto thisModel = models::LightCollectionEfficiencyWeighted;
 
 class ntuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     public:
@@ -383,8 +384,8 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     thisPCaloHitsHandle = pCaloHits_EE_Handle;
                 }
                 //Set the various tree quantities for the RECO object
-                if(i == 0)myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, models::LightCollectionEfficiencyWeighted, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
-                if(i == 1)myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, models::LightCollectionEfficiencyWeighted, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                if(i == 0)myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                if(i == 1)myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
                 rawSuperClusterEnergy[i]      = (*photonHandle)[index[i]].superCluster()->rawEnergy();
                 energyR[i]                    = (*photonHandle)[index[i]].energy();
                 eta[i]                        = (*photonHandle)[index[i]].eta();
@@ -409,8 +410,8 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     thisPCaloHitsHandle = pCaloHits_EE_Handle;
                 }
                 //Set the various tree quantities for the RECO object
-                if(i == 0) myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, models::LightCollectionEfficiencyWeighted, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
-                if(i == 1) myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, models::LightCollectionEfficiencyWeighted, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                if(i == 0) myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                if(i == 1) myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
                 energyR[i]                    = (*electronHandle)[index[i]].correctedEcalEnergy();
                 rawSuperClusterEnergy[i]      = (*electronHandle)[index[i]].superCluster()->rawEnergy();
                 eta[i]                        = (*electronHandle)[index[i]].eta();
