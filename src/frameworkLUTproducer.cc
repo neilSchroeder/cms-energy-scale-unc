@@ -29,7 +29,7 @@
 #include <TPaletteAxis.h>
 #include <TStyle.h>
 #include <TTree.h>
-#include "../interface/frameworkSystematicsProducer.h"
+#include "../interface/frameworkLUTproducer.h"
 
 //#define ETA_VETO
 
@@ -37,7 +37,7 @@ extern std::string DIRECTORY_NAME;
 
 /// Produce FNUF Histograms only analyzes two files at a time
 
-void mySystematicsProducer::produce_LookUpTables(std::string fileName){
+void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corrections){
 
     std::cout << "begin producing look-up tables... " << std::endl;
 
@@ -184,23 +184,28 @@ void mySystematicsProducer::produce_LookUpTables(std::string fileName){
                 
                 mean1 = e_0_hists[eta][99-apd]->GetMean();
                 mean2 = g_0_hists[eta][99-apd]->GetMean();
-                mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_0);
+                if(corrections) mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_0);
+                else mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
                 mean1 = e_1_hists[eta][99-apd]->GetMean();
                 mean2 = g_1_hists[eta][99-apd]->GetMean();
-                mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_1);
+                if(corrections) mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_1);
+                else mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
                 mean1 = e_2_hists[eta][99-apd]->GetMean();
                 mean2 = g_2_hists[eta][99-apd]->GetMean();
-                mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_2);
+                if(corrections) mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_2);
+                else mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
                 mean1 = e_3_hists[eta][99-apd]->GetMean();
                 mean2 = g_3_hists[eta][99-apd]->GetMean();
-                mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_3);
+                if(corrections) mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_3);
+                else mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
                 mean1 = e_4_hists[eta][99-apd]->GetMean();
                 mean2 = g_4_hists[eta][99-apd]->GetMean();
-                mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_4);
+                if(corrections) mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_4);
+                else mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
                 delete e_0_hists[eta][99-apd];
                 delete g_0_hists[eta][99-apd];
@@ -222,24 +227,24 @@ void mySystematicsProducer::produce_LookUpTables(std::string fileName){
     TH2F * mean_EE_3 = (TH2F*)mean_3->Clone();
     TH2F * mean_EE_4 = (TH2F*)mean_4->Clone();
 
-    mySystematicsProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 1.44419, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_1, "lookUpTable_EB_R9_1", 0., 1.44419, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_2, "lookUpTable_EB_R9_2", 0., 1.44419, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_3, "lookUpTable_EB_R9_3", 0., 1.44419, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_4, "lookUpTable_EB_R9_4", 0., 1.44419, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 1.44419, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_1, "lookUpTable_EB_R9_1", 0., 1.44419, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_2, "lookUpTable_EB_R9_2", 0., 1.44419, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_3, "lookUpTable_EB_R9_3", 0., 1.44419, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_4, "lookUpTable_EB_R9_4", 0., 1.44419, -0.7, 0.7);
 
-    mySystematicsProducer::plot_LookUpTable( mean_EE_0, "lookUpTable_EE_R9_0", 1.566, 2.499, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_EE_1, "lookUpTable_EE_R9_1", 1.566, 2.499, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_EE_2, "lookUpTable_EE_R9_2", 1.566, 2.499, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_EE_3, "lookUpTable_EE_R9_3", 1.566, 2.499, -0.7, 0.7);
-    mySystematicsProducer::plot_LookUpTable( mean_EE_4, "lookUpTable_EE_R9_4", 1.566, 2.499, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_EE_0, "lookUpTable_EE_R9_0", 1.566, 2.499, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_EE_1, "lookUpTable_EE_R9_1", 1.566, 2.499, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_EE_2, "lookUpTable_EE_R9_2", 1.566, 2.499, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_EE_3, "lookUpTable_EE_R9_3", 1.566, 2.499, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_EE_4, "lookUpTable_EE_R9_4", 1.566, 2.499, -0.7, 0.7);
 
     std::cout << std::endl << "look-up tables have been produced ... " << std::endl;
 
     return;
 };
 
-void mySystematicsProducer::plot_LookUpTable( TH2F* thisHist, std::string title, double xMin, double xMax, double zMin, double zMax){
+void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title, double xMin, double xMax, double zMin, double zMax){
     TCanvas * a = new TCanvas("a", "", 900, 900);
     a->cd();
     gStyle->SetPalette(kBird);

@@ -38,7 +38,7 @@ extern std::string DIRECTORY_NAME;
 
 /// Produce FNUF Histograms only analyzes two files at a time
 
-void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName){
+void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool corrections){
     int numR9bins = 5;
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
 
@@ -186,7 +186,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName){
                 mean2 = g_0_hists[eta][99-apd]->GetMean();
                 error1 = e_0_hists[eta][99-apd]->GetRMS()/sqrt(e_0_hists[eta][99-apd]->GetEntries());
                 error2 = g_0_hists[eta][99-apd]->GetRMS()/sqrt(g_0_hists[eta][99-apd]->GetEntries());
-                systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                if(corrections) systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                else systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
                 systematics[apd][0]->SetBinError(eta + 1, 0.00001);
 
                 correction_norm = std::max( fabs(low_ratio_1->GetBinContent(eta+1, apd+1)), fabs(high_ratio_1->GetBinContent(eta+1, apd+1)));
@@ -195,7 +196,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName){
                 mean2 = g_1_hists[eta][99-apd]->GetMean();
                 error1 = e_1_hists[eta][99-apd]->GetRMS()/sqrt(e_1_hists[eta][99-apd]->GetEntries());
                 error2 = g_1_hists[eta][99-apd]->GetRMS()/sqrt(g_1_hists[eta][99-apd]->GetEntries());
-                systematics[apd][1]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                if(corrections) systematics[apd][1]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                else systematics[apd][1]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
                 systematics[apd][1]->SetBinError(eta + 1, 0.00001);
 
                 correction_norm = std::max( fabs(low_ratio_2->GetBinContent(eta+1, apd+1)), fabs(high_ratio_2->GetBinContent(eta+1, apd+1)));
@@ -204,7 +206,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName){
                 mean2 = g_2_hists[eta][99-apd]->GetMean();
                 error1 = e_2_hists[eta][99-apd]->GetRMS()/sqrt(e_2_hists[eta][99-apd]->GetEntries());
                 error2 = g_2_hists[eta][99-apd]->GetRMS()/sqrt(g_2_hists[eta][99-apd]->GetEntries());
-                systematics[apd][2]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                if(corrections) systematics[apd][2]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                else systematics[apd][2]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
                 systematics[apd][2]->SetBinError(eta + 1, 0.00001);
 
                 correction_norm = std::max( fabs(low_ratio_3->GetBinContent(eta+1, apd+1)), fabs(high_ratio_3->GetBinContent(eta+1, apd+1)));
@@ -213,7 +216,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName){
                 mean2 = g_3_hists[eta][99-apd]->GetMean();
                 error1 = e_3_hists[eta][99-apd]->GetRMS()/sqrt(e_3_hists[eta][99-apd]->GetEntries());
                 error2 = g_3_hists[eta][99-apd]->GetRMS()/sqrt(g_3_hists[eta][99-apd]->GetEntries());
-                systematics[apd][3]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                if(corrections) systematics[apd][3]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                else systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
                 systematics[apd][3]->SetBinError(eta + 1, 0.00001);
 
                 correction_norm = std::max( fabs(low_ratio_4->GetBinContent(eta+1, apd+1)), fabs(high_ratio_4->GetBinContent(eta+1, apd+1)));
@@ -222,7 +226,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName){
                 mean2 = g_4_hists[eta][99-apd]->GetMean();
                 error1 = e_4_hists[eta][99-apd]->GetRMS()/sqrt(e_4_hists[eta][99-apd]->GetEntries());
                 error2 = g_4_hists[eta][99-apd]->GetRMS()/sqrt(g_4_hists[eta][99-apd]->GetEntries());
-                systematics[apd][4]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                if(corrections) systematics[apd][4]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
+                else systematics[apd][4]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
                 systematics[apd][4]->SetBinError(eta + 1, 0.00001);
 
             }

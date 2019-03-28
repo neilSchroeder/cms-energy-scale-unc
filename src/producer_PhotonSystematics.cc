@@ -24,10 +24,10 @@
  */
 
 #include "../interface/frameworkHistogramProducer.h"
-#include "../interface/frameworkSystematicsProducer.h"
+#include "../interface/frameworkLUTproducer.h"
 #include "../interface/frameworkSystematicsPlotter.h"
-#include <boost/program_options.hpp>
 #include <iostream>
+#include "boost/program_options.hpp"
 
 int main( int argc, char **argv ){
     using namespace boost;
@@ -37,6 +37,7 @@ int main( int argc, char **argv ){
     std::string phoInputFile;
     std::string rootFileOut;
     std::string outDir;
+    bool        boostedSystematics;
 
     opts::options_description desc("Main Options");
     
@@ -45,6 +46,7 @@ int main( int argc, char **argv ){
         ("phoInputFile", opts::value<std::string>(&phoInputFile), "Photon Input File")
         ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output Root File Name")
         ("outDir", opts::value<std::string>(&outDir), "Output Directory")
+        ("boostedSystematics", opts::value<bool>(&boostedSystematics), "Boost systematics to cover method uncertainties");
     ;
 
     opts::variables_map v_map;
@@ -52,7 +54,7 @@ int main( int argc, char **argv ){
     opts::notify(v_map);
     
     myHistogramProducer hist_producer;
-    mySystematicsProducer syst_producer;
+    myLookUpTableProducer table_producer;
     mySystematicsPlotter syst_plotter;
 
     hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
@@ -60,8 +62,8 @@ int main( int argc, char **argv ){
     rootFileOut = outDir+rootFileOut;
     if(rootFileOut.find(".root") == std::string::npos) rootFileOut = rootFileOut+".root";
 
-    syst_producer.produce_LookUpTables(rootFileOut);
-    syst_plotter.produce_2016_2017_Plots(rootFileOut);
+    table_producer.produce_LookUpTables(rootFileOut, boostedSystematics);
+    syst_plotter.produce_2016_2017_Plots(rootFileOut, boostedSystematics);
 
     return 0;
 }
