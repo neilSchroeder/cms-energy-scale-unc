@@ -217,7 +217,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 error1 = e_3_hists[eta][99-apd]->GetRMS()/sqrt(e_3_hists[eta][99-apd]->GetEntries());
                 error2 = g_3_hists[eta][99-apd]->GetRMS()/sqrt(g_3_hists[eta][99-apd]->GetEntries());
                 if(corrections) systematics[apd][3]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*(1 + (correction_front/100.) + (correction_norm/100.)));
-                else systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
+                else systematics[apd][3]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
                 systematics[apd][3]->SetBinError(eta + 1, 0.00001);
 
                 correction_norm = std::max( fabs(low_ratio_4->GetBinContent(eta+1, apd+1)), fabs(high_ratio_4->GetBinContent(eta+1, apd+1)));
