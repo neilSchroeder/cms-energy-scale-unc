@@ -13,4 +13,7 @@ class mySystematicsPlotter{
         void produce_2016_2017_Plots(std::string, bool);
         void plot_2016( TH1F*, TH1F*, TH1F*, TH1F*, TH1F*, std::string, std::string, double, double);
         void plot_2017( TH1F*, TH1F*, TH1F*, TH1F*, TH1F*, std::string, std::string, double, double);
+        void produce_2016_2017_PionPlots(std::string, bool);
+        void plot_Pion2016( TH1F*, std::string, std::string, double, double);
+        void plot_Pion2017( TH1F*, std::string, std::string, double, double);
 };

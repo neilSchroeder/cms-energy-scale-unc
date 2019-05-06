@@ -54,6 +54,7 @@ class framework{
         void initializeGlobals();
         void correctedEnergy( reco::Photon, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], double [], float *, int *);
         void correctedEnergy( reco::GsfElectron, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], double [], float *, int *);
+        void correctedEnergy( reco::GenParticle, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], double [], float *, int *);
         int getShowerMax( reco::Photon, edm::PCaloHitContainer);
         int getShowerMax( reco::GsfElectron, edm::PCaloHitContainer);
 };

@@ -79,7 +79,8 @@ process.ntuples = cms.EDAnalyzer('ntuples',
 				 motherID = cms.int32(25), #cms.int32(options.MotherID),
 				 daughterID = cms.int32(22), #cms.int32(options.DaughterID),
 				 #eleTightIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
-				 photons = cms.bool(True))
+				 photons = cms.bool(True),
+                 pions = cms.bool(True))
 
 #prepare the output file
 options.OutputFile = 'file:' + options.OutputFile

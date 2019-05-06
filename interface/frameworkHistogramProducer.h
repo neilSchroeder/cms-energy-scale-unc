@@ -7,4 +7,5 @@ class myHistogramProducer{
 
     public:
         void produce_FNUF_Histograms( std::string, std::string, std::string, std::string);
+        void produce_PION_Histograms( std::string, std::string, std::string, std::string);
 };

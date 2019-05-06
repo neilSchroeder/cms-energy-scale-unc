@@ -244,8 +244,73 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
     return;
 };
 
+void myLookUpTableProducer::produce_PionLookUpTables(std::string fileName, bool corrections){
+
+    std::cout << "begin producing look-up tables... " << std::endl;
+
+	int numR9bins = 5;
+	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
+
+	int numEtaBins = 8;
+	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
+	TFile* myHistograms = new TFile(fileName.c_str(), "READ");
+
+    std::cout << "initializing histograms ... " << std::endl;
+    
+	TH2F * mean_0 = new TH2F("mean_0", "Photon Systematics [%], 0 < R9 < 0.8", numEtaBins, etaBins, 100, 0.005, 1.005);
+
+	std::vector< std::vector<TH1F*> > e_0_hists;
+	std::vector< std::vector<TH1F*> > g_0_hists;
+
+	std::vector<TH1F*> e_0;
+	std::vector<TH1F*> g_0;
+
+	char title [50];
+	for(int i = 0; i < numEtaBins; i++){
+		for(int j = 0; j < 100; j++){
+			sprintf( title, "e_0_%i_%i_%i", i, i+1, j);
+			e_0.push_back((TH1F*)myHistograms->Get(title));
+			sprintf( title, "g_0_%i_%i_%i", i, i+1, j);
+			g_0.push_back((TH1F*)myHistograms->Get(title));
+      	}
+		e_0_hists.push_back(e_0);
+		g_0_hists.push_back(g_0);
+		e_0.clear();
+		g_0.clear();
+	}
+
+    std::cout << "evaluating systematics ... " << std::endl;
+
+	double mean1, mean2;
+	double err1, err2;
+	double ratio;
+	double quantile;
+	for(int eta = 0; eta < numEtaBins; eta++){
+        if(etaBins[eta] != 1.4442 && etaBins[eta+1] != 1.566){
+            for(int apd = 0; apd < 100; apd++){
+                mean1 = e_0_hists[eta][99-apd]->GetMean();
+                mean2 = g_0_hists[eta][99-apd]->GetMean();
+                mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                delete e_0_hists[eta][99-apd];
+                delete g_0_hists[eta][99-apd];
+            }
+        }
+    }
+
+    TH2F * mean_EE_0 = (TH2F*)mean_0->Clone();
+
+    myLookUpTableProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 1.44419, -0.1, 0.4);
+
+    myLookUpTableProducer::plot_LookUpTable( mean_EE_0, "lookUpTable_EE_R9_0", 1.566, 2.499, -0.1, 0.45);
+
+    std::cout << std::endl << "look-up tables have been produced ... " << std::endl;
+
+    return;
+};
+
 void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title, double xMin, double xMax, double zMin, double zMax){
     TCanvas * a = new TCanvas("a", "", 900, 900);
+    if( !(thisHist) ) std::cout << "uh oh" << std::endl;
     a->cd();
     gStyle->SetPalette(kBird);
     gStyle->SetOptStat(0);

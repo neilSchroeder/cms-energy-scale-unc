@@ -38,6 +38,7 @@ int main( int argc, char **argv ){
     std::string rootFileOut;
     std::string outDir;
     bool        boostedSystematics;
+    bool        usingPions;
 
     opts::options_description desc("Main Options");
     
@@ -46,8 +47,11 @@ int main( int argc, char **argv ){
         ("phoInputFile", opts::value<std::string>(&phoInputFile), "Photon Input File")
         ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output Root File Name")
         ("outDir", opts::value<std::string>(&outDir), "Output Directory")
-        ("boostedSystematics", opts::value<bool>(&boostedSystematics), "Boost systematics to cover method uncertainties");
+        ("boostedSystematics", opts::value<bool>(&boostedSystematics), "Boost systematics to cover method uncertainties")
+        ("usingPions", opts::value<bool>(&usingPions), "If you are using pions instead of photons for this production, enable this option");        
     ;
+
+    if( usingPions ) std::cout << "You are using pions" << std::endl;
 
     opts::variables_map v_map;
     opts::store(opts::parse_command_line(argc, argv, desc), v_map);
@@ -57,13 +61,20 @@ int main( int argc, char **argv ){
     myLookUpTableProducer table_producer;
     mySystematicsPlotter syst_plotter;
 
-    hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
+    if( usingPions ) hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
+    else hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
 
     rootFileOut = outDir+rootFileOut;
     if(rootFileOut.find(".root") == std::string::npos) rootFileOut = rootFileOut+".root";
 
-    table_producer.produce_LookUpTables(rootFileOut, boostedSystematics);
-    syst_plotter.produce_2016_2017_Plots(rootFileOut, boostedSystematics);
+    if( usingPions ){
+    table_producer.produce_PionLookUpTables(rootFileOut, boostedSystematics);
+    syst_plotter.produce_2016_2017_PionPlots(rootFileOut, boostedSystematics);
+    }
+    else{
+        table_producer.produce_LookUpTables(rootFileOut, boostedSystematics);
+        syst_plotter.produce_2016_2017_Plots(rootFileOut, boostedSystematics);
+    }
 
     return 0;
 }

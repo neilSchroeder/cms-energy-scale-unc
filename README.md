@@ -58,6 +58,7 @@ When it comes time to run the producer there will be 4 arguments passed to the p
  3) --rootFileOut: this is the name of the root file containing all the intermediary histograms. You may choose the name for this file. There is protection built into the framework on the off chance you do not include the ".root" at the end of the file name. If you forget to include it, do not interrupt the program as it will be able to handle this.
  4) --outDir: this is the name of the directory you wish to have everything written to. The name should be unique as it will be created along-side the folders in this repository.
  5) --bostedSystematics: this is a bool that turns on or off (true or false) the additional scaling of the uncertainties to cover uncertainties introduced by the method of derivation.
+ 6) --usingPions: this is a bool that indicates to the program whether or not you are analyzing pions. When analyzing pions use the --phoInputFile option with a list of pion files.
 
 You should now be ready to run the producer. It should be run from the photonEnScaleUnc/ folder and an example is given below:
 

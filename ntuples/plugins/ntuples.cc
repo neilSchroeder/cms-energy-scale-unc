@@ -122,9 +122,10 @@ class ntuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
         int motherID;
         int daughterID;
         bool photons;
+        bool pions;
 
         //Handles and tokens
-        edm::Handle<edm::View<reco::GenParticle> > particle;
+        edm::Handle<edm::View<reco::GenParticle> > particleHandle;
         edm::EDGetTokenT<edm::View< reco::GenParticle > > particleToken;
         edm::Handle<edm::View<PileupSummaryInfo> > PupInfo;
         edm::EDGetTokenT<edm::View<PileupSummaryInfo> > PupInfoToken;
@@ -156,7 +157,9 @@ class ntuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 ntuples::ntuples(const edm::ParameterSet& iConfig):
     motherID(iConfig.getParameter<int>("motherID")),
     daughterID(iConfig.getParameter<int>("daughterID")),
-    photons(iConfig.getParameter<bool>("photons"))
+    photons(iConfig.getParameter<bool>("photons")),
+    pions(iConfig.getParameter<bool>("pions"))
+
 {
     //now do what ever initialization is needed
 
@@ -224,15 +227,13 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     event = iEvent.id().event();
     lum = iEvent.id().luminosityBlock();
 
-    iEvent.getByToken(particleToken, particle);         //GenParticles
+    iEvent.getByToken(particleToken, particleHandle);         //GenParticles
     iEvent.getByToken(electronToken, electronHandle);   //GsfElectron
     iEvent.getByToken(photonToken, photonHandle);       //Photon
     iEvent.getByToken(pCaloHits_EB_Token, pCaloHits_EB_Handle); //PCaloHits EB
     iEvent.getByToken(pCaloHits_EE_Token, pCaloHits_EE_Handle); //PCaloHits EE
     iEvent.getByToken(recHit_EB_Token, recHit_EB_Handle);       //EcalRecHits EB
     iEvent.getByToken(recHit_EE_Token, recHit_EE_Handle);       //EcalRecHits EE
-
-
 
 #ifdef CrossCheck
     edm::PCaloHitContainer::const_iterator caloHitsItr;
@@ -282,30 +283,11 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 #endif
     }
 
-    models myModels;
     framework myFramework;
+    pions = true;
     //for each of the GenParticle objects, find the first two which are daughter of higgs or Z
     //this nonsense needs to be redone
     std::vector<reco::GenParticle> genPair;
-    for (auto &p : *particle){
-        if( abs(p.pdgId()) == daughterID ){ 
-            //			if( p.mother(0)->pdgId() == motherID ){ // this line makes sure the GenParticles are not the same
-            const reco::GenParticle* p_temp = dynamic_cast<const reco::GenParticle*>(&p);
-            while(p_temp->status() != 1){
-                p_temp = dynamic_cast<const reco::GenParticle*>(p_temp->daughter(0));
-            }
-            genPair.push_back(*p_temp); 
-            //			}// end mother ID check
-        }// end daughter ID check
-    }//end for particle
-
-    //fill some quantities for the GenParticle
-    for(int i = 0; i < 2; i++){
-        energyG[i]  = genPair[i].energy();
-        etaS[i]     = genPair[i].eta();
-        phiS[i]     = genPair[i].phi();
-    }
-
     //dr of closest RecoCandidate to GenParticle
     float mindr [2] = {999, 999}; 
 
@@ -314,63 +296,87 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     //for each of the GenParticle objects, find the closest RecoCandidate.
     float tempDr;
-    for(int i = 0; i < lengthGenPair; i++){
-        int count = 0;
-        if(photons){
-            for (auto &g : *photonHandle){
-                tempDr = deltaR(g, genPair[i]);
-                if( tempDr < mindr[i] ){
-                    index[i] = count;
-                    mindr[i] = tempDr;
-                }//end if smaller dr
-                count++;
-            }//end for 
+
+    if(!pions){
+        for (auto &p : *particleHandle){
+            if( abs(p.pdgId()) == daughterID ){ 
+                //			if( p.mother(0)->pdgId() == motherID ){ // this line makes sure the GenParticles are not the same
+                const reco::GenParticle* p_temp = dynamic_cast<const reco::GenParticle*>(&p);
+                while(p_temp->status() != 1){
+                    p_temp = dynamic_cast<const reco::GenParticle*>(p_temp->daughter(0));
+                }
+                genPair.push_back(*p_temp); 
+                //			}// end mother ID check
+            }// end daughter ID check
+        }//end for particle
+
+        //fill some quantities for the GenParticle
+        for(int i = 0; i < 2; i++){
+            energyG[i]  = genPair[i].energy();
+            etaS[i]     = genPair[i].eta();
+            phiS[i]     = genPair[i].phi();
         }
-        else{
-            for (auto &g : *electronHandle){
-                tempDr = deltaR(g, genPair[i]);
-                if( tempDr < mindr[i] && index[0] != count ){
-                    index[i] = count;
-                    mindr[i] = tempDr;
-                }//end if smaller dr
-                count++;
-            }//end for 
-        }
-    }//end for each GenParticle of pair
 
-    //if the above loop returns both of the particles look for a different one
-    if( index[0] == index[1]){
-        int redo;
-        int noredo;
-        if( mindr[0] < mindr[1]){ redo = 1; noredo = 0;	}//end if mindr
-        else{ redo = 0; noredo = 1; }
+        for(int i = 0; i < lengthGenPair; i++){
+            int count = 0;
+            if(photons){
+                for (auto &g : *photonHandle){
+                    tempDr = deltaR(g, genPair[i]);
+                    if( tempDr < mindr[i] ){
+                        index[i] = count;
+                        mindr[i] = tempDr;
+                    }//end if smaller dr
+                    count++;
+                }//end for 
+            }
+            else{
+                for (auto &g : *electronHandle){
+                    tempDr = deltaR(g, genPair[i]);
+                    if( tempDr < mindr[i] && index[0] != count ){
+                        index[i] = count;
+                        mindr[i] = tempDr;
+                    }//end if smaller dr
+                    count++;
+                }//end for 
+            }
+        }//end for each GenParticle of pair
 
-        mindr[redo] = 999;
-        index[redo] = -1;
+        //if the above loop returns both of the particles look for a different one
+        if( index[0] == index[1]){
+            int redo;
+            int noredo;
+            if( mindr[0] < mindr[1]){ redo = 1; noredo = 0;	}//end if mindr
+            else{ redo = 0; noredo = 1; }
 
-        int count = 0;
-        if(photons && fabs(photonHandle->size()) > 1){
-            for (auto &g : *photonHandle){
-                tempDr = deltaR(g, genPair[redo]);
-                if( tempDr < mindr[redo] && index[noredo] != count ){
-                    index[redo] = count;
-                    mindr[redo] = tempDr;
-                }//end if smaller dr
-                count++;
-            }//end for 
-        }//end if photon
-        else if (!photons && fabs(electronHandle->size()) > 1){
-            for (auto &g : *electronHandle){
-                tempDr = deltaR(g, genPair[redo]);
-                if( tempDr < mindr[redo] && index[noredo] != count ){
-                    index[redo] = count;
-                    mindr[redo] = tempDr;
-                }//end if smaller dr
-                count++;
-            }//end for 
-        }//else
-    }//end if index
+            mindr[redo] = 999;
+            index[redo] = -1;
 
+            int count = 0;
+            if(photons && fabs(photonHandle->size()) > 1){
+                for (auto &g : *photonHandle){
+                    tempDr = deltaR(g, genPair[redo]);
+                    if( tempDr < mindr[redo] && index[noredo] != count ){
+                        index[redo] = count;
+                        mindr[redo] = tempDr;
+                    }//end if smaller dr
+                    count++;
+                }//end for 
+            }//end if photon
+            else if(!photons && fabs(electronHandle->size()) > 1){
+                for (auto &g : *electronHandle){
+                    tempDr = deltaR(g, genPair[redo]);
+                    if( tempDr < mindr[redo] && index[noredo] != count ){
+                        index[redo] = count;
+                        mindr[redo] = tempDr;
+                    }//end if smaller dr
+                    count++;
+                }//end for 
+            }//else
+        }//end if index
+    }
+
+
+    bool electrons = (!photons) && (!pions);
     for(int i = 0; i < 2; i++){dr[i] = mindr[i];}
 
     //fill quantities
@@ -400,7 +406,7 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    else{
+    else if(electrons){
         //ELECTRON 1
         for(int i = 0; i < 2; i++){
 
@@ -421,6 +427,22 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 full5x5_R9[i]                 = (*electronHandle)[index[i]].full5x5_r9();
                 showerMaxBin[i]               = myFramework.getShowerMax((*electronHandle)[index[i]], *thisPCaloHitsHandle);
             }// end if index[0]
+        }//end for electrons
+    }//end if electrons
+    else if(pions){
+        int picount = 0;
+        for(auto &p : *particleHandle){
+            if( fabs(p.eta()) > 1.479){
+                thisRecHitHandle = recHit_EE_Handle;
+                thisPCaloHitsHandle = pCaloHits_EE_Handle;
+            }
+            //Set the various tree quantities for the RECO object
+            if(picount == 0) myFramework.correctedEnergy(p, *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[picount]), &(supClustCrystals[picount]));
+            if(picount == 1) myFramework.correctedEnergy(p, *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[picount]), &(supClustCrystals[picount]));
+            energyR[picount]                    = p.energy();
+            eta[picount]                        = p.eta();
+            phi[picount]                        = p.phi();
+            picount++;
         }//end for electrons
     }//end if electrons
 
