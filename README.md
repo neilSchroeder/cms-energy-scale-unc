@@ -91,3 +91,8 @@ with the name of the new model added. For example if the new model you've implem
 ```
 
 Once this is changed, simply repeat the analysis and expect that some minor changes may need to be made to the framework to get the plotting to come out nicely.
+
+## Works in Progress
+
+The ability to analyze pions has recently been added. This feature is a gen level analyzer. The energy in a dR cone of 0.8 around the GEN level eta of the pion. Crystals in the transition region are not excluded yet. 
+
