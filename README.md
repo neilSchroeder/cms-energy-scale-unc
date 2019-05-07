@@ -94,5 +94,5 @@ Once this is changed, simply repeat the analysis and expect that some minor chan
 
 ## Works in Progress
 
-The ability to analyze pions has recently been added. This feature is a gen level analyzer. The energy in a dR cone of 0.8 around the GEN level eta of the pion. Crystals in the transition region are not excluded yet. 
+The ability to analyze pions has recently been added. This feature is a gen level analyzer. The energy in a dR cone of 0.8 around the GEN level eta of the pion. Crystals in the transition region are not excluded yet. Futhermore, a range of 0.8 in eta covers a large range of radiation damage in the crystals. A method should be developed to account for this range and implement a way to vary the laser response of each crystal according to it's location in the detector. This method would change the structure a bit and look-up tables would no longer be necessary since the information on laser response per crystal and how it relates to nearby crystals is specific to a given period of time.
 
