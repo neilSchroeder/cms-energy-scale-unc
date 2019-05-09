@@ -66,6 +66,7 @@ double RING_RESPONSE [100];
 double RING_REWEIGHT_EB [100];
 double RING_REWEIGHT_EE [100];
 double RING_ETA [100];
+double NUM_XTAL_BINS = 16383.;
 std::map< std::pair<int, int>, double> ecal_map_barrel;
 std::map< std::tuple<int, int, int>, double> ecal_map_endcap;
 double MAX_DR = 0.8;
@@ -159,10 +160,10 @@ void framework::correctedEnergy( reco::Photon e, edm::SortedCollection<EcalRecHi
 					if(caloHitsItr->id() == currentId){
 
 						//Get the Depth of the PCaloHit and its corresponding bin
-						depthHere = (double)((caloHitsItr->depth())>>2)/16383.; //16383 is 2^14 - 1
+						depthHere = (double)((caloHitsItr->depth())>>2)/NUM_XTAL_BINS; //16383 is 2^14 - 1
 						//sum up the weighted energy using functions
-						if( depthHere == 0.) depthHere = 1./16384.;
-						if( depthHere == 1.) depthHere = 1 - 1./16384.;
+						if( depthHere == 0.) depthHere = 1./(NUM_XTAL_BINS);
+						if( depthHere == 1.) depthHere = 1 - 1./(NUM_XTAL_BINS);
                         if(depthHere > 0. && depthHere < 1.){
 						    //the following line calculates the energy with default LCE weights.
                             defaultSimE += caloHitsItr->energy();
@@ -256,10 +257,10 @@ void framework::correctedEnergy( reco::GsfElectron e, edm::SortedCollection<Ecal
                     //We only want PCaloHits in this super cluster
                     if(caloHitsItr->id() == currentId){
                         //Get the Depth of the PCaloHit and its corresponding bin
-                        depthHere = (double)((caloHitsItr->depth())>>2)/16383.; //16383 is 2^14 - 1
+                        depthHere = (double)((caloHitsItr->depth())>>2)/NUM_XTAL_BINS; //16383 is 2^14 - 1
                         //sum up the weighted energy using functions
-                       	if( depthHere == 0.) depthHere = 1./16384.;
-                       	if( depthHere == 1.) depthHere = 1 - 1./16384.;
+                       	if( depthHere == 0.) depthHere = 1./NUM_XTAL_BINS;
+                       	if( depthHere == 1.) depthHere = 1 - 1./NUM_XTAL_BINS;
                         if(depthHere > 0. && depthHere < 1.){
                             //the following line calculates the energy with default LCE weights.
                             defaultSimE += caloHitsItr->energy();
@@ -399,10 +400,10 @@ void framework::correctedEnergy( reco::GenParticle e, edm::SortedCollection<Ecal
                     //We only want PCaloHits in this super cluster
                     if(caloHitsItr->id() == currentId){
                         //Get the Depth of the PCaloHit and its corresponding bin
-                        depthHere = (double)((caloHitsItr->depth())>>2)/16383.; //16383 is 2^14 - 1
+                        depthHere = (double)((caloHitsItr->depth())>>2)/NUM_XTAL_BINS; //16383 is 2^14 - 1
                         //sum up the weighted energy using functions
-                       	if( depthHere == 0.) depthHere = 1./16384.;
-                       	if( depthHere == 1.) depthHere = 1 - 1./16384.;
+                       	if( depthHere == 0.) depthHere = 1./NUM_XTAL_BINS;
+                       	if( depthHere == 1.) depthHere = 1 - 1./NUM_XTAL_BINS;
                         if(depthHere > 0. && depthHere < 1.){
                             //the following line calculates the energy with default LCE weights.
                             defaultSimE += caloHitsItr->energy();
@@ -451,7 +452,7 @@ int framework::getShowerMax( reco::Photon thisPhoton, edm::PCaloHitContainer pCa
 	for(hit = pCaloHits.begin(); hit != pCaloHits.end(); hit++){
 		if( hit->id() == thisPhoton.superCluster()->seed()->seed().rawId()){
 			energy = hit->energy();
-			depth = (double)((hit->depth())>>2)/16383.;
+			depth = (double)((hit->depth())>>2)/NUM_XTAL_BINS;
 			showerShape->Fill(depth, energy);
 		}
 	}
@@ -467,7 +468,7 @@ int framework::getShowerMax( reco::GsfElectron thisElectron, edm::PCaloHitContai
 	for(hit = pCaloHits.begin(); hit != pCaloHits.end(); hit++){
 		if( hit->id() == thisElectron.superCluster()->seed()->seed().rawId()){
 			energy = hit->energy();
-			depth = (double)((hit->depth())>>2)/16383.;
+			depth = (double)((hit->depth())>>2)/NUM_XTAL_BINS;
 			showerShape->Fill(depth, energy);
 		}
 	}

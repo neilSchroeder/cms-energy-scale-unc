@@ -88,8 +88,8 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 	int bins = 125600;
 	//create the necessary histograms
 	for(int iii = 0; iii < numEtaBins; iii++){
-		double etaMax = ((double)iii+1)*(2.5/(double)numEtaBins);
-		double etaMin = (double)iii * 2.5/(double)numEtaBins;
+		double etaMax = etaBins[iii+1];
+		double etaMin = etaBins[iii];
 		double apd = 1;
 		for(int jjj = 0; jjj < 100; jjj++){
 			if( jjj > 0 ) apd -= 0.01;

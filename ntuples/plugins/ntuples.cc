@@ -284,7 +284,6 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
     framework myFramework;
-    pions = true;
     //for each of the GenParticle objects, find the first two which are daughter of higgs or Z
     //this nonsense needs to be redone
     std::vector<reco::GenParticle> genPair;

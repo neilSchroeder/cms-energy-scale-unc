@@ -88,8 +88,8 @@ std::string myUtilities::produce_FNUF_Histograms( char ** cLineArgs, int i ){
 	int bins = 125600;
 	//create the necessary histograms
 	for(int iii = 0; iii < numEtaBins; iii++){
-		double etaMax = ((double)iii+1)*(2.5/(double)numEtaBins);
-		double etaMin = (double)iii * 2.5/(double)numEtaBins;
+		double etaMax = etaBins[iii+1];
+		double etaMin = etaBins[iii];
 		double apd = 1;
 		for(int jjj = 0; jjj < 100; jjj++){
 			if( jjj > 0 ) apd -= 0.01;
@@ -229,7 +229,6 @@ std::string myUtilities::produce_FNUF_Histograms( char ** cLineArgs, int i ){
                             //determine which eta bin the first electron falls into
                             int etaIndex1 = fabs(etaSC[0])/(2.5/(double)numEtaBins);
                             int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);;
-#ifdef Bins9
                             for(int i = 0; i < numEtaBins - 1 ; i++){
                                 if( fabs(etaSC[0]) > etaBins[i] && fabs(etaSC[0]) < etaBins[i+1]){
                                     etaIndex1 = i;
@@ -238,32 +237,6 @@ std::string myUtilities::produce_FNUF_Histograms( char ** cLineArgs, int i ){
                                     etaIndex2 = i;
                                 }
                             }
-#endif
-#ifdef Bins12
-                            if(etaIndex1 == 7){
-                                if(fabs(etaSC[0]) < 1.442) etaIndex1 = 6;
-                                if(fabs(etaSC[0]) > 1.5) etaIndex1 = 8;
-                            }
-                            //electron 2 eta bin
-                            if(etaIndex2 == 7){
-                                if(fabs(etaSC[1]) < 1.442) etaIndex2 = 6;
-                                if(fabs(etaSC[1]) > 1.5) etaIndex2 = 8;
-                            }
-#endif
-#ifdef Bins24
-                            if(etaIndex1 == 14){
-                                if(fabs(etaSC[0]) < 1.442) etaIndex1 = 13;
-                                if(fabs(etaSC[0]) > 1.5) etaIndex1 = 15;
-                            }
-                            //electron 2 eta bin
-                            if(etaIndex2 == 14){
-                                if(fabs(etaSC[1]) < 1.442) etaIndex2 = 12;
-                                if(fabs(etaSC[1]) > 1.5) etaIndex2 = 14;
-                            }
-#endif
-                            //the following if statement is just a catch for particles
-                            //     with an eta more than 2.5
-
 
                             if( etaIndex1 < numEtaBins && etaIndex2 < numEtaBins){
                                 noVeto = true;
@@ -1073,17 +1046,17 @@ void myUtilities::produce_RatioLookUpTables(std::string fileName1, std::string f
     ratio_4->Write();
     outputRatioHists->Close();
 
-    myUtilities::plot_LookUpTable( ratio_0, "ratioLookUpTable_EB_R9_0", 0., 1.44419, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_1, "ratioLookUpTable_EB_R9_1", 0., 1.44419, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_2, "ratioLookUpTable_EB_R9_2", 0., 1.44419, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_3, "ratioLookUpTable_EB_R9_3", 0., 1.44419, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_4, "ratioLookUpTable_EB_R9_4", 0., 1.44419, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_0, "ratioLookUpTable_EB_R9_0", 0., 1.44419, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_1, "ratioLookUpTable_EB_R9_1", 0., 1.44419, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_2, "ratioLookUpTable_EB_R9_2", 0., 1.44419, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_3, "ratioLookUpTable_EB_R9_3", 0., 1.44419, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_4, "ratioLookUpTable_EB_R9_4", 0., 1.44419, -15, 15);
 
-    myUtilities::plot_LookUpTable( ratio_EE_0, "ratioLookUpTable_EE_R9_0", 1.566, 2.499, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_EE_1, "ratioLookUpTable_EE_R9_1", 1.566, 2.499, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_EE_2, "ratioLookUpTable_EE_R9_2", 1.566, 2.499, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_EE_3, "ratioLookUpTable_EE_R9_3", 1.566, 2.499, -15, 15);
-    myUtilities::plot_LookUpTable( ratio_EE_4, "ratioLookUpTable_EE_R9_4", 1.566, 2.499, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_EE_0,"ratioLookUpTable_EE_R9_0", 1.566, 2.499, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_EE_1,"ratioLookUpTable_EE_R9_1", 1.566, 2.499, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_EE_2,"ratioLookUpTable_EE_R9_2", 1.566, 2.499, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_EE_3,"ratioLookUpTable_EE_R9_3", 1.566, 2.499, -15, 15);
+    myUtilities::plot_LookUpTable(ratio_EE_4,"ratioLookUpTable_EE_R9_4", 1.566, 2.499, -15, 15);
 
     std::cout << std::endl << "ratio look-up tables have been produced ... " << std::endl;
     delete myHistograms1;
