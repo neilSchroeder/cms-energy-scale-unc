@@ -23,6 +23,8 @@ Implementation:
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -43,6 +45,11 @@ Implementation:
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
+
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/CaloTopology/interface/CaloTopology.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/Records/interface/CaloTopologyRecord.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHit.h"
@@ -93,6 +100,8 @@ class ntuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
         // ----------member data ---------------------------
 
+        const CaloTopology * _topology; 
+
         //Ttree data members
         float_t R9 [2];
         float_t full5x5_R9 [2];
@@ -107,6 +116,10 @@ class ntuples : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
         float_t def_nomiRecHitSum [2];
         double apd_lce_RecHitSums1 [100];
         double apd_lce_RecHitSums2 [100];
+        double apd_lce_3x3RecHitSums1 [100];
+        double apd_lce_3x3RecHitSums2 [100];
+        double apd_lce_R9_1 [100];
+        double apd_lce_R9_2 [100];
         double linearEnergies1 [8];
         double linearEnergies2 [8];
         float_t dr [2];
@@ -172,6 +185,10 @@ ntuples::ntuples(const edm::ParameterSet& iConfig):
     data->Branch("Rechit_Energy_Sum_1", def_nomiRecHitSum, "def_nomiRecHitSum[2]/F");
     data->Branch("apd_lce_RecHitSums1", apd_lce_RecHitSums1, "apd_lce_RecHitSums1[100]/D");
     data->Branch("apd_lce_RecHitSums2", apd_lce_RecHitSums2, "apd_lce_RecHitSums2[100]/D");
+    data->Branch("apd_lce_3x3RecHitSums1", apd_lce_3x3RecHitSums1, "apd_lce_3x3RecHitSums1[100]/D");
+    data->Branch("apd_lce_3x3RecHitSums2", apd_lce_3x3RecHitSums2, "apd_lce_3x3RecHitSums2[100]/D");
+    data->Branch("apd_lce_R9_1", apd_lce_R9_1, "apd_lce_R9_1[100]/D");
+    data->Branch("apd_lce_R9_2", apd_lce_R9_2, "apd_lce_R9_2[100]/D");
 #ifdef LinearEnergy
     data->Branch("Linear_Energies_1", linearEnergies1, "linearEnergies1[8]/D");
     data->Branch("Linear_Energies_2", linearEnergies2, "linearEnergies2[8]/D");
@@ -235,6 +252,11 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     iEvent.getByToken(recHit_EB_Token, recHit_EB_Handle);       //EcalRecHits EB
     iEvent.getByToken(recHit_EE_Token, recHit_EE_Handle);       //EcalRecHits EE
 
+    edm::ESHandle<CaloTopology> caloTopo;
+    iSetup.get<CaloTopologyRecord>().get(caloTopo);
+    _topology = caloTopo.product();
+
+
 #ifdef CrossCheck
     edm::PCaloHitContainer::const_iterator caloHitsItr;
     for(caloHitsItr = pCaloHits_EB_Handle->begin(); caloHitsItr != pCaloHits_EB_Handle->end(); caloHitsItr++){
@@ -275,6 +297,10 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for( int i = 0; i < 100; i++){
         apd_lce_RecHitSums1[i] = 0;
         apd_lce_RecHitSums2[i] = 0;
+        apd_lce_3x3RecHitSums1[i] = 0;
+        apd_lce_3x3RecHitSums2[i] = 0;
+        apd_lce_R9_1[i] = 0;
+        apd_lce_R9_2[i] = 0;
 #ifdef LinearEnergy
         if( i < 8){
             linearEnergies1[i] = 0;
@@ -389,8 +415,21 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     thisPCaloHitsHandle = pCaloHits_EE_Handle;
                 }
                 //Set the various tree quantities for the RECO object
-                if(i == 0)myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
-                if(i == 1)myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                if(i == 0){
+                    myFramework.corrected3x3Energy((*photonHandle)[index[i]], *thisRecHitHandle, _topology, *thisPCaloHitsHandle, thisModel, apd_lce_3x3RecHitSums1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    for(int i = 0; i < 100; i++){
+                        apd_lce_R9_1[i] = apd_lce_3x3RecHitSums1[i]/apd_lce_RecHitSums1[i];
+                    }
+                }
+
+                if(i == 1){
+                    myFramework.corrected3x3Energy((*photonHandle)[index[i]], *thisRecHitHandle, _topology, *thisPCaloHitsHandle, thisModel, apd_lce_3x3RecHitSums2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    myFramework.correctedEnergy((*photonHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    for(int i = 0; i < 100; i++){
+                        apd_lce_R9_2[i] = apd_lce_3x3RecHitSums2[i]/apd_lce_RecHitSums2[i];
+                    }
+                }
                 rawSuperClusterEnergy[i]      = (*photonHandle)[index[i]].superCluster()->rawEnergy();
                 energyR[i]                    = (*photonHandle)[index[i]].energy();
                 eta[i]                        = (*photonHandle)[index[i]].eta();
@@ -415,8 +454,21 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     thisPCaloHitsHandle = pCaloHits_EE_Handle;
                 }
                 //Set the various tree quantities for the RECO object
-                if(i == 0) myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
-                if(i == 1) myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                if(i == 0){
+                    myFramework.corrected3x3Energy((*electronHandle)[index[i]], *thisRecHitHandle, _topology, *thisPCaloHitsHandle, thisModel, apd_lce_3x3RecHitSums1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums1, linearEnergies1, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    for(int i = 0; i < 100; i++){
+                        apd_lce_R9_1[i] = apd_lce_3x3RecHitSums1[i]/apd_lce_RecHitSums1[i];
+                    }
+                }
+
+                if(i == 1){
+                    myFramework.corrected3x3Energy((*electronHandle)[index[i]], *thisRecHitHandle, _topology, *thisPCaloHitsHandle, thisModel, apd_lce_3x3RecHitSums2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    myFramework.correctedEnergy((*electronHandle)[index[i]], *thisRecHitHandle, *thisPCaloHitsHandle, thisModel, apd_lce_RecHitSums2, linearEnergies2, &(def_nomiRecHitSum[i]), &(supClustCrystals[i]));
+                    for(int i = 0; i < 100; i++){
+                        apd_lce_R9_2[i] = apd_lce_3x3RecHitSums2[i]/apd_lce_RecHitSums2[i];
+                    }
+                }
                 energyR[i]                    = (*electronHandle)[index[i]].correctedEcalEnergy();
                 rawSuperClusterEnergy[i]      = (*electronHandle)[index[i]].superCluster()->rawEnergy();
                 eta[i]                        = (*electronHandle)[index[i]].eta();

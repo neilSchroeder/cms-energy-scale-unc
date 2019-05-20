@@ -41,6 +41,10 @@
 
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
+
+#include "RecoCaloTools/Navigation/interface/CaloNavigator.h"
+
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TTree.h"
@@ -442,6 +446,167 @@ void framework::correctedEnergy( reco::GenParticle e, edm::SortedCollection<Ecal
 
 	return;
 };
+
+void framework::corrected3x3Energy( reco::Photon e, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > recHits, const CaloTopology* topology, edm::PCaloHitContainer pCaloHits, double  (*weight)(double, double, double, double) , double ret3x3LCE [50], float * defaultEnergy, int * numSupClustCrystals){
+	using namespace std;
+    models myModels;
+	//some variables
+	double updatedSimE [50] = {0.};
+
+	double defaultSimE = 0.;
+	EcalRecHit crystalHere;
+	double crystalEnergy;
+	double depthHere;
+	int apdBins = 50;
+        double totalCrystalEnergy = 0.;
+
+	uint32_t currentId;
+
+	edm::PCaloHitContainer::const_iterator caloHitsItr;
+	edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >::const_iterator recHitsItr;
+
+	//get the super cluster and its hits and fractions collection
+	reco::SuperClusterRef eSupClust = e.superCluster();
+//	const std::vector< std::pair<DetId, float> > crystIDs = eSupClust->hitsAndFractions();
+
+	std::vector<DetId> v_id = noZS::EcalClusterTools::matrixDetId(topology, e.superCluster()->seed()->seed().rawId(), -1, 1, -1, 1);
+	//now we need to get the PCaloHitContainer by DetId
+	//first we loop over the crystals.
+	std::set<uint32_t> recIDs;
+	for(int i = 0; i < fabs(v_id.size()); i++){
+
+		//if we have seen this crystal already, do not process it
+		if( recIDs.find(v_id[i].rawId()) == recIDs.end()){
+			recIDs.insert(v_id[i].rawId());
+
+			//dont run past the end of the collection
+			if( recHits.find(v_id[i].rawId()) != recHits.end()){
+				//define the current crystal ID and its energy;
+				currentId     = v_id[i].rawId();
+				crystalHere   = *(recHits.find(currentId));
+				crystalEnergy = crystalHere.energy();
+
+				//a correction must be applied crystal by crystal
+                for( int iii = 0; iii < apdBins; iii++){ updatedSimE[iii] = 0.;}
+                
+		defaultSimE = 0.;
+
+                //Now we loop over the PCaloHits
+                for(caloHitsItr = pCaloHits.begin(); caloHitsItr != pCaloHits.end(); caloHitsItr++){
+
+                    //We only want PCaloHits in this super cluster
+                    if(caloHitsItr->id() == currentId){
+                        //Get the Depth of the PCaloHit and its corresponding bin
+                        depthHere = (double)((caloHitsItr->depth())>>2)/16383.; //16383 is 2^14 - 1
+                        //sum up the weighted energy using functions
+                       	if( depthHere == 0.) depthHere = 1./16384.;
+                       	if( depthHere == 1.) depthHere = 1 - 1./16384.;
+                        if(depthHere > 0. && depthHere < 1.){
+                            //the following line calculates the energy with default LCE weights.
+                            defaultSimE += caloHitsItr->energy();
+                            for(int jjj = 0; jjj < apdBins; jjj++){
+                                if( fabs(e.eta()) < 1.497) updatedSimE[jjj] += caloHitsItr->energy()*weight(depthHere, e.eta(), ::RING_RESPONSE[jjj], ::RING_REWEIGHT_EB[jjj])/(myModels.LightCollectionEfficiencyDefault(depthHere));
+                                else if( fabs(e.eta()) >= 1.497) updatedSimE[jjj] += caloHitsItr->energy()*weight(depthHere, e.eta(), ::RING_RESPONSE[jjj], ::RING_REWEIGHT_EE[jjj])/(myModels.LightCollectionEfficiencyDefault(depthHere));
+                            }// end for apdBins
+
+                        }//end if energy is broken
+                    }//end if currentId
+                }// end for caloHits
+				if(crystalEnergy > 0.07 && defaultSimE != 0.){// cut on noisy crystals
+					for(int zzz = 0; zzz < apdBins; zzz++){
+						ret3x3LCE[zzz] += updatedSimE[zzz]*crystalEnergy/defaultSimE;
+					}
+                        totalCrystalEnergy += crystalEnergy;
+				}// end if defaultSimE != 0
+			}// end if not end of recHits
+		}//end if crystal already in set
+	}//end for crystals in 3*3
+	*numSupClustCrystals = recIDs.size();
+        *defaultEnergy = (float)totalCrystalEnergy;
+
+	return;
+};
+
+void framework::corrected3x3Energy( reco::GsfElectron e, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > recHits, const CaloTopology* topology, edm::PCaloHitContainer pCaloHits, double  (*weight)(double, double, double, double) , double ret3x3LCE [50], float * defaultEnergy, int * numSupClustCrystals){
+	using namespace std;
+    models myModels;
+	//some variables
+	double updatedSimE [50] = {0.};
+
+	double defaultSimE = 0.;
+	EcalRecHit crystalHere;
+	double crystalEnergy;
+	double depthHere;
+	int apdBins = 50;
+        double totalCrystalEnergy = 0.;
+
+	uint32_t currentId;
+
+	edm::PCaloHitContainer::const_iterator caloHitsItr;
+	edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >::const_iterator recHitsItr;
+
+	//get the super cluster and its hits and fractions collection
+	reco::SuperClusterRef eSupClust = e.superCluster();
+//	const std::vector< std::pair<DetId, float> > crystIDs = eSupClust->hitsAndFractions();
+
+	std::vector<DetId> v_id = noZS::EcalClusterTools::matrixDetId(topology, e.superCluster()->seed()->seed().rawId(), -1, 1, -1, 1);
+	//now we need to get the PCaloHitContainer by DetId
+	//first we loop over the crystals.
+	std::set<uint32_t> recIDs;
+	for(int i = 0; i < fabs(v_id.size()); i++){
+
+		//if we have seen this crystal already, do not process it
+		if( recIDs.find(v_id[i].rawId()) == recIDs.end()){
+			recIDs.insert(v_id[i].rawId());
+
+			//dont run past the end of the collection
+			if( recHits.find(v_id[i].rawId()) != recHits.end()){
+				//define the current crystal ID and its energy;
+				currentId     = v_id[i].rawId();
+				crystalHere   = *(recHits.find(currentId));
+				crystalEnergy = crystalHere.energy();
+
+				//a correction must be applied crystal by crystal
+                for( int iii = 0; iii < apdBins; iii++){ updatedSimE[iii] = 0.;}
+                
+		defaultSimE = 0.;
+
+                //Now we loop over the PCaloHits
+                for(caloHitsItr = pCaloHits.begin(); caloHitsItr != pCaloHits.end(); caloHitsItr++){
+
+                    //We only want PCaloHits in this super cluster
+                    if(caloHitsItr->id() == currentId){
+                        //Get the Depth of the PCaloHit and its corresponding bin
+                        depthHere = (double)((caloHitsItr->depth())>>2)/16383.; //16383 is 2^14 - 1
+                        //sum up the weighted energy using functions
+                       	if( depthHere == 0.) depthHere = 1./16384.;
+                       	if( depthHere == 1.) depthHere = 1 - 1./16384.;
+                        if(depthHere > 0. && depthHere < 1.){
+                            //the following line calculates the energy with default LCE weights.
+                            defaultSimE += caloHitsItr->energy();
+                            for(int jjj = 0; jjj < apdBins; jjj++){
+                                if( fabs(e.eta()) < 1.497) updatedSimE[jjj] += caloHitsItr->energy()*weight(depthHere, e.eta(), ::RING_RESPONSE[jjj], ::RING_REWEIGHT_EB[jjj])/(myModels.LightCollectionEfficiencyDefault(depthHere));
+                                else if( fabs(e.eta()) >= 1.497) updatedSimE[jjj] += caloHitsItr->energy()*weight(depthHere, e.eta(), ::RING_RESPONSE[jjj], ::RING_REWEIGHT_EE[jjj])/(myModels.LightCollectionEfficiencyDefault(depthHere));
+                            }// end for apdBins
+
+                        }//end if energy is broken
+                    }//end if currentId
+                }// end for caloHits
+				if(crystalEnergy > 0.07 && defaultSimE != 0.){// cut on noisy crystals
+					for(int zzz = 0; zzz < apdBins; zzz++){
+						ret3x3LCE[zzz] += updatedSimE[zzz]*crystalEnergy/defaultSimE;
+					}
+                        totalCrystalEnergy += crystalEnergy;
+				}// end if defaultSimE != 0
+			}// end if not end of recHits
+		}//end if crystal already in set
+	}//end for crystals in 3*3
+	*numSupClustCrystals = recIDs.size();
+        *defaultEnergy = (float)totalCrystalEnergy;
+
+	return;
+};
+
 
 int framework::getShowerMax( reco::Photon thisPhoton, edm::PCaloHitContainer pCaloHits){
 	int ret = -999;

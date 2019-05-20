@@ -7,6 +7,11 @@
 <use name="CommonTools/UtilAlgos"/>
 <use name="PhysicsTools/UtilAlgos"/>
 <use name="SimDataFormats/CaloHit"/>
+<use name="RecoEcal/EgammaCoreTools"/>
+<use name="Geometry/CaloGeometry"/>
+<use name="Geometry/CaloTopology"/>
+<use name="Geometry/Records"/>
+
 
 <flags EDM_PLUGIN="1"/>
 <Flags CXXFLAGS="-g"/>

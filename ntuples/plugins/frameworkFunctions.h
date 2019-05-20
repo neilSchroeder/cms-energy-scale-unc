@@ -30,6 +30,11 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/CaloTopology/interface/CaloTopology.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/Records/interface/CaloTopologyRecord.h"
+
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHit.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
@@ -55,6 +60,8 @@ class framework{
         void correctedEnergy( reco::Photon, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], double [], float *, int *);
         void correctedEnergy( reco::GsfElectron, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], double [], float *, int *);
         void correctedEnergy( reco::GenParticle, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], double [], float *, int *);
+        void corrected3x3Energy( reco::Photon, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, const CaloTopology *, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], float *, int *);
+        void corrected3x3Energy( reco::GsfElectron, edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >, const CaloTopology *, edm::PCaloHitContainer, double (*weight)(double, double, double, double), double [], float *, int *);
         int getShowerMax( reco::Photon, edm::PCaloHitContainer);
         int getShowerMax( reco::GsfElectron, edm::PCaloHitContainer);
 };
