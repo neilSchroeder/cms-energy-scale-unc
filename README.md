@@ -1,6 +1,6 @@
-# CMS: Systematic Uncertainty on the Photon Energy Scale
+# CMS: Framework for Applying Light Collection Efficiency Models 
 
-Code for obtaining the systematic uncertainty on the photon energy scale using the method outlined in AN-18-079.
+Code for applying updated light collection efficiency models in CMSSW in an offline, flexible way. The documentation here is specifically targeted at reproducing results quoted in CMS-AN-18-079, but is a maleable framework which can be used for many interesting studies.
 
  This documentation contains the following:
 
