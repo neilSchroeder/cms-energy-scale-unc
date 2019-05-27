@@ -32,7 +32,7 @@ From your preference of work area, run the following commands:
     cd CMSSW_8_0_26_patch1/src/
     cmsenv
     git cms-init
-    git clone git@github.com:neilSchroeder/cms-photon-energy-scale-unc.git lceFramework 
+    git clone git@github.com:neilSchroeder/cms-lce-framework.git lceFramework 
     cd lceFramework
     scram b -j 4
     make
