@@ -36,6 +36,14 @@
 
 extern std::string DIRECTORY_NAME;
 
+double laser_response_2016 [7] = {0.93, 0.93, 0.92, 0.91, 0.82, 0.72, 0.56};
+double laser_response_2017 [7] = {0.91, 0.90, 0.89, 0.88, 0.77, 0.65, 0.45};
+double laser_response_2018 [7] = {0.90, 0.90, 0.88, 0.86, 0.75, 0.61, 0.40};
+
+int laserResponseBins_2016 [7] = {92, 92, 91, 90, 81, 71, 55};
+int laserResponseBins_2017 [7] = {90, 89, 88, 87, 76, 64, 44};
+int laserResponseBins_2018 [7] = {89, 89, 87, 86, 74, 60, 39};
+
 /// Produce FNUF Histograms only analyzes two files at a time
 
 void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool corrections){
@@ -246,67 +254,53 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     TH1F * endcap2017_3 = new TH1F("endcap2017_3", "endcap2017_3", 8, etaBins);
     TH1F * endcap2017_4 = new TH1F("endcap2017_4", "endcap2017_4", 8, etaBins);
 
-    endcap2016_0->SetBinContent(6, systematics[93][0]->GetBinContent(6));
-    endcap2016_0->SetBinContent(7, systematics[73][0]->GetBinContent(7));
-    endcap2016_0->SetBinContent(8, systematics[59][0]->GetBinContent(8));
-    endcap2016_1->SetBinContent(6, systematics[93][1]->GetBinContent(6));
-    endcap2016_1->SetBinContent(7, systematics[73][1]->GetBinContent(7));
-    endcap2016_1->SetBinContent(8, systematics[59][1]->GetBinContent(8));
-    endcap2016_2->SetBinContent(6, systematics[93][2]->GetBinContent(6));
-    endcap2016_2->SetBinContent(7, systematics[73][2]->GetBinContent(7));
-    endcap2016_2->SetBinContent(8, systematics[59][2]->GetBinContent(8));
-    endcap2016_3->SetBinContent(6, systematics[93][3]->GetBinContent(6));
-    endcap2016_3->SetBinContent(7, systematics[73][3]->GetBinContent(7));
-    endcap2016_3->SetBinContent(8, systematics[59][3]->GetBinContent(8));
-    endcap2016_4->SetBinContent(6, systematics[93][4]->GetBinContent(6));
-    endcap2016_4->SetBinContent(7, systematics[73][4]->GetBinContent(7));
-    endcap2016_4->SetBinContent(8, systematics[59][4]->GetBinContent(8));
-    endcap2016_0->SetBinError(6, systematics[93][0]->GetBinError(6));
-    endcap2016_0->SetBinError(7, systematics[73][0]->GetBinError(7));
-    endcap2016_0->SetBinError(8, systematics[59][0]->GetBinError(8));
-    endcap2016_1->SetBinError(6, systematics[93][1]->GetBinError(6));
-    endcap2016_1->SetBinError(7, systematics[73][1]->GetBinError(7));
-    endcap2016_1->SetBinError(8, systematics[59][1]->GetBinError(8));
-    endcap2016_2->SetBinError(6, systematics[93][2]->GetBinError(6));
-    endcap2016_2->SetBinError(7, systematics[73][2]->GetBinError(7));
-    endcap2016_2->SetBinError(8, systematics[59][2]->GetBinError(8));
-    endcap2016_3->SetBinError(6, systematics[93][3]->GetBinError(6));
-    endcap2016_3->SetBinError(7, systematics[73][3]->GetBinError(7));
-    endcap2016_3->SetBinError(8, systematics[59][3]->GetBinError(8));
-    endcap2016_4->SetBinError(6, systematics[93][4]->GetBinError(6));
-    endcap2016_4->SetBinError(7, systematics[73][4]->GetBinError(7));
-    endcap2016_4->SetBinError(8, systematics[59][4]->GetBinError(8));
+    TH1F * endcap2018_0 = new TH1F("endcap2018_0", "endcap2018_0", 8, etaBins);
+    TH1F * endcap2018_1 = new TH1F("endcap2018_1", "endcap2018_1", 8, etaBins);
+    TH1F * endcap2018_2 = new TH1F("endcap2018_2", "endcap2018_2", 8, etaBins);
+    TH1F * endcap2018_3 = new TH1F("endcap2018_3", "endcap2018_3", 8, etaBins);
+    TH1F * endcap2018_4 = new TH1F("endcap2018_4", "endcap2018_4", 8, etaBins);
 
-    endcap2017_0->SetBinContent(6, systematics[79][0]->GetBinContent(6));
-    endcap2017_0->SetBinContent(7, systematics[65][0]->GetBinContent(7));
-    endcap2017_0->SetBinContent(8, systematics[49][0]->GetBinContent(8));
-    endcap2017_1->SetBinContent(6, systematics[79][1]->GetBinContent(6));
-    endcap2017_1->SetBinContent(7, systematics[65][1]->GetBinContent(7));
-    endcap2017_1->SetBinContent(8, systematics[49][1]->GetBinContent(8));
-    endcap2017_2->SetBinContent(6, systematics[79][2]->GetBinContent(6));
-    endcap2017_2->SetBinContent(7, systematics[65][2]->GetBinContent(7));
-    endcap2017_2->SetBinContent(8, systematics[49][2]->GetBinContent(8));
-    endcap2017_3->SetBinContent(6, systematics[79][3]->GetBinContent(6));
-    endcap2017_3->SetBinContent(7, systematics[65][3]->GetBinContent(7));
-    endcap2017_3->SetBinContent(8, systematics[49][3]->GetBinContent(8));
-    endcap2017_4->SetBinContent(6, systematics[79][4]->GetBinContent(6));
-    endcap2017_4->SetBinContent(7, systematics[65][4]->GetBinContent(7));
-    endcap2017_4->SetBinContent(8, systematics[49][4]->GetBinContent(8));
-    endcap2017_0->SetBinError(6, systematics[79][0]->GetBinError(6));
-    endcap2017_0->SetBinError(7, systematics[65][0]->GetBinError(7));
-    endcap2017_0->SetBinError(8, systematics[49][0]->GetBinError(8));
-    endcap2017_1->SetBinError(6, systematics[79][1]->GetBinError(6));
-    endcap2017_1->SetBinError(7, systematics[65][1]->GetBinError(7));
-    endcap2017_1->SetBinError(8, systematics[49][1]->GetBinError(8));
-    endcap2017_2->SetBinError(6, systematics[79][2]->GetBinError(6));
-    endcap2017_2->SetBinError(7, systematics[65][2]->GetBinError(7));
-    endcap2017_2->SetBinError(8, systematics[49][2]->GetBinError(8));
-    endcap2017_3->SetBinError(6, systematics[79][3]->GetBinError(6));
-    endcap2017_3->SetBinError(7, systematics[65][3]->GetBinError(7));
-    endcap2017_3->SetBinError(8, systematics[49][3]->GetBinError(8));
-    endcap2017_4->SetBinError(6, systematics[79][4]->GetBinError(6));
-    endcap2017_4->SetBinError(7, systematics[65][4]->GetBinError(7));
-    endcap2017_4->SetBinError(8, systematics[49][4]->GetBinError(8));
+    for(int i = 0; i < 5; i++){
+        for(int j = 6; j < 9; j++){
+            switch( i ){
+                case 0:
+                    endcap2016_0->SetBinContent(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinContent(j));
+                    endcap2017_0->SetBinContent(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinContent(j));
+                    endcap2018_0->SetBinContent(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinContent(j));
+                    endcap2016_0->SetBinError(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinError(j));
+                    endcap2017_0->SetBinError(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinError(j));
+                    endcap2018_0->SetBinError(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinError(j));
+                case 1:
+                    endcap2016_1->SetBinContent(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinContent(j));
+                    endcap2017_1->SetBinContent(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinContent(j));
+                    endcap2018_1->SetBinContent(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinContent(j));
+                    endcap2016_1->SetBinError(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinError(j));
+                    endcap2017_1->SetBinError(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinError(j));
+                    endcap2018_1->SetBinError(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinError(j));
+                case 2:
+                    endcap2016_2->SetBinContent(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinContent(j));
+                    endcap2017_2->SetBinContent(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinContent(j));
+                    endcap2018_2->SetBinContent(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinContent(j));
+                    endcap2016_2->SetBinError(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinError(j));
+                    endcap2017_2->SetBinError(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinError(j));
+                    endcap2018_2->SetBinError(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinError(j));
+                case 3:
+                    endcap2016_3->SetBinContent(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinContent(j));
+                    endcap2017_3->SetBinContent(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinContent(j));
+                    endcap2018_3->SetBinContent(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinContent(j));
+                    endcap2016_3->SetBinError(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinError(j));
+                    endcap2017_3->SetBinError(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinError(j));
+                    endcap2018_3->SetBinError(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinError(j));
+                case 4:
+                    endcap2016_4->SetBinContent(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinContent(j));
+                    endcap2017_4->SetBinContent(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinContent(j));
+                    endcap2018_4->SetBinContent(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinContent(j));
+                    endcap2016_4->SetBinError(j, systematics[laserResponseBins_2016[j-2]][i]->GetBinError(j));
+                    endcap2017_4->SetBinError(j, systematics[laserResponseBins_2017[j-2]][i]->GetBinError(j));
+                    endcap2018_4->SetBinError(j, systematics[laserResponseBins_2018[j-2]][i]->GetBinError(j));
+            }
+        }
+    }
 
     std::cout << "writing systematics to text file ... " << std::endl;
 
@@ -323,19 +317,15 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge laser_response systematic statUnc" << std::endl;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < numR9bins; j++){
-            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " 0.94 " << systematics[93][j]->GetBinContent(i+1) << std::endl;
+            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laserResponseBins_2016[i] << " "  << systematics[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
         }
     }
     for(int i = 5; i < 8; i++){
-        std::string laserResponse = "";
-        if( i == 5 ) laserResponse = 0.94;
-        if( i == 6 ) laserResponse = 0.74;
-        if( i == 7 ) laserResponse = 0.60;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laserResponse << " " << endcap2016_0->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laserResponse << " " << endcap2016_1->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laserResponse << " " << endcap2016_2->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laserResponse << " " << endcap2016_3->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laserResponse << " " << endcap2016_4->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laserResponseBins_2016[i-1] << " " << endcap2016_0->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laserResponseBins_2016[i-1] << " " << endcap2016_1->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laserResponseBins_2016[i-1] << " " << endcap2016_2->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laserResponseBins_2016[i-1] << " " << endcap2016_3->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laserResponseBins_2016[i-1] << " " << endcap2016_4->GetBinContent(i+1) << std::endl;
     }
     out.close();
     fileOutPre = DIRECTORY_NAME+"/fnuf_systematics_2017";
@@ -344,23 +334,36 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge systematic" << std::endl;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < numR9bins; j++){
-            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " 0.92 " << systematics[91][j]->GetBinContent(i+1) << " " << systematics[91][j]->GetBinContent(i+1) << std::endl;
+            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laserResponseBins_2017[i] << " " << systematics[laserResponseBins_2017[i]][j]->GetBinContent(i+1) << std::endl;
         }
     }
     for(int i = 5; i < 8; i++){
-        std::string laserResponse = "";
-        if( i == 5) laserResponse = 0.80;
-        if( i == 6) laserResponse = 0.66;
-        if( i == 7) laserResponse = 0.50;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << endcap2017_0->GetBinContent(i+1) << " " << endcap2017_0->GetBinError(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << endcap2017_1->GetBinContent(i+1) << " " << endcap2017_1->GetBinError(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << endcap2017_2->GetBinContent(i+1) << " " << endcap2017_2->GetBinError(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << endcap2017_3->GetBinContent(i+1) << " " << endcap2017_3->GetBinError(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << endcap2017_4->GetBinContent(i+1) << " " << endcap2017_4->GetBinError(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laserResponseBins_2017[i-1] << " " << endcap2017_0->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laserResponseBins_2017[i-1] << " " << endcap2017_1->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laserResponseBins_2017[i-1] << " " << endcap2017_2->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laserResponseBins_2017[i-1] << " " << endcap2017_3->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laserResponseBins_2017[i-1] << " " << endcap2017_4->GetBinContent(i+1) << std::endl;
+    }
+    out.close();
+    fileOutPre = DIRECTORY_NAME+"/fnuf_systematics_2018";
+    textFileName = fileOutPre+energy+".txt";
+    out.open(textFileName.c_str(), std::ofstream::out | std::ofstream::trunc);
+    out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge systematic" << std::endl;
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < numR9bins; j++){
+            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laserResponseBins_2018[i] << " " << systematics[laserResponseBins_2018[i]][j]->GetBinContent(i+1) << std::endl;
+        }
+    }
+    for(int i = 5; i < 8; i++){
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laserResponseBins_2018[i-1] << " " << endcap2018_0->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laserResponseBins_2018[i-1] << " " << endcap2018_1->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laserResponseBins_2018[i-1] << " " << endcap2018_2->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laserResponseBins_2018[i-1] << " " << endcap2018_3->GetBinContent(i+1) << std::endl;
+        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laserResponseBins_2018[i-1] << " " << endcap2018_4->GetBinContent(i+1) << std::endl;
     }
     out.close();
 
-    std::cout << "plotting the systematics for 2016 and 2017 ... " << std::endl;
+    std::cout << "plotting the systematics for 2016, 2017, and 2018 ... " << std::endl;
 
     if(fileName.find("030") != std::string::npos) energy = "30 GeV";
     if(fileName.find("045") != std::string::npos) energy = "45 GeV";
@@ -368,11 +371,14 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     if(fileName.find("120") != std::string::npos) energy = "120 GeV";
 
     std::string region = "EB";
-    mySystematicsPlotter::plot_2016(systematics[93][0], systematics[93][1], systematics[93][2], systematics[93][3], systematics[93][4], energy, region, -0.05, 0.25);
-    mySystematicsPlotter::plot_2017(systematics[91][0], systematics[91][1], systematics[91][2], systematics[91][3], systematics[91][4], energy, region, -0.10, 0.35);
+    mySystematicsPlotter::plot_year(systematics[laserResponseBins_2016[0]][0], systematics[laserResponseBins_2016[1]][1], systematics[laserResponseBins_2016[2]][2], systematics[laserResponseBins_2016[3]][3], systematics[laserResponseBins_2016[4]][4], "2016", energy, region, -0.05, 0.30);
+    mySystematicsPlotter::plot_year(systematics[laserResponseBins_2016[0]][0], systematics[laserResponseBins_2016[1]][1], systematics[laserResponseBins_2016[2]][2], systematics[laserResponseBins_2016[3]][3], systematics[laserResponseBins_2016[4]][4], "2017", energy, region, -0.05, 0.35);
+    mySystematicsPlotter::plot_year(systematics[laserResponseBins_2016[0]][0], systematics[laserResponseBins_2016[1]][1], systematics[laserResponseBins_2016[2]][2], systematics[laserResponseBins_2016[3]][3], systematics[laserResponseBins_2016[4]][4], "2018", energy, region, -0.05, 0.40);
+
     region = "EE";
-    mySystematicsPlotter::plot_2016(endcap2016_0, endcap2016_1, endcap2016_2, endcap2016_3, endcap2016_4, energy, region, -0.05, 0.6 );
-    mySystematicsPlotter::plot_2017(endcap2017_0, endcap2017_1, endcap2017_2, endcap2017_3, endcap2017_4, energy, region, -0.05, 0.9);
+    mySystematicsPlotter::plot_year(endcap2016_0, endcap2016_1, endcap2016_2, endcap2016_3, endcap2016_4, "2016", energy, region, -0.05, 0.6);
+    mySystematicsPlotter::plot_year(endcap2017_0, endcap2017_1, endcap2017_2, endcap2017_3, endcap2017_4, "2017", energy, region, -0.05, 0.9);
+    mySystematicsPlotter::plot_year(endcap2018_0, endcap2018_1, endcap2018_2, endcap2018_3, endcap2018_4, "2018", energy, region, -0.05, 1.2);
     return;
 };
 
@@ -438,7 +444,6 @@ void mySystematicsPlotter::produce_2016_2017_PionPlots(std::string fileName, boo
     }
 
     TH1F * endcap2016_0 = new TH1F("endcap2016_0", "endcap2016_0", 8, etaBins);
-
     TH1F * endcap2017_0 = new TH1F("endcap2017_0", "endcap2017_0", 8, etaBins);
 
     endcap2016_0->SetBinContent(6, systematics[93][0]->GetBinContent(6));
@@ -515,7 +520,7 @@ void mySystematicsPlotter::produce_2016_2017_PionPlots(std::string fileName, boo
     return;
 };
 
-void mySystematicsPlotter::plot_2016( TH1F * hist0, TH1F * hist1, TH1F * hist2, TH1F * hist3, TH1F * hist4, std::string energy, std::string region, double yMin, double yMax){
+void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, TH1F * hist3, TH1F * hist4, std::string year, std::string energy, std::string region, double yMin, double yMax){
     double xmin = 0;
     double xmax = 2.4999999;
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
@@ -565,8 +570,9 @@ void mySystematicsPlotter::plot_2016( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
 	legend->AddEntry(hist2, "0.90 < R_{9} < 0.92", "lp");
 	legend->AddEntry(hist3, "0.92 < R_{9} < 0.96", "lp");
 	legend->AddEntry(hist4, "0.96 < R_{9} < 1.00", "lp");
-	legend->AddEntry((TObject*)0, "2016 Conditions", "");
-    std::string temp = "#gamma/e gun: " + energy;
+    std::string temp = year+" Conditions";
+	legend->AddEntry((TObject*)0, temp.c_str(), "");
+    temp = "#gamma/e gun: " + energy;
     std::cout << temp << " " << energy << std::endl;
 	legend->AddEntry((TObject*)0, temp.c_str(), "");
 	hist0->SetYTitle("#bf{Systematics [%]}");
@@ -604,109 +610,11 @@ void mySystematicsPlotter::plot_2016( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
     if(energy.find("60") != std::string::npos) energy = "_060GeV";
     if(energy.find("120") != std::string::npos) energy = "_120GeV";
 
-    std::string name = DIRECTORY_NAME+"/systematics_2016_"+region+energy+".pdf";
+    std::string name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".pdf";
 	a_0->SaveAs(name.c_str());
-    name = DIRECTORY_NAME+"/systematics_2016_"+region+energy+".C";
+    name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".C";
     a_0->SaveAs(name.c_str());
-    name = DIRECTORY_NAME+"/systematics_2016_"+region+energy+".png";
-    a_0->SaveAs(name.c_str());
-    delete line;
-    delete a_0;
-    return;
-};
-
-void mySystematicsPlotter::plot_2017( TH1F * hist0, TH1F * hist1, TH1F * hist2, TH1F * hist3, TH1F * hist4, std::string energy, std::string region, double yMin, double yMax){
-    double xmin = 0;
-    double xmax = 2.4999999;
-    if( region.find("EB") != std::string::npos ) xmax = 1.4;
-    if( region.find("EE") != std::string::npos ) xmin = 1.57;
-
-	gStyle->SetPalette(kBird);
-	gStyle->SetOptStat(0);
-	gStyle->SetOptTitle(0);
-	gStyle->SetPaintTextFormat("0.2f");
-
-	TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
-	TLatex* lumi_label = new TLatex(0.822, 0.91, "#font[42]{13 TeV}");
-	TCanvas * a_0 = new TCanvas("a0", "", 900, 900);
-	a_0->cd();
-	gPad->SetRightMargin(0.03);
-	gPad->SetLeftMargin(0.125);
-	gPad->SetGridy(1);
-	gPad->SetGridx(1);
-	hist0->SetLineColor(kRed);
-	hist0->SetLineWidth(3);
-	hist0->SetMarkerStyle(kFullCircle);
-	hist0->SetMarkerColor(kRed);
-	hist0->SetMarkerSize(3);
-	hist1->SetLineColor(kOrange+7);
-	hist1->SetLineWidth(3);
-	hist1->SetMarkerStyle(kFullSquare);
-	hist1->SetMarkerColor(kOrange+7);
-	hist1->SetMarkerSize(3);
-	hist2->SetLineColor(kGreen+2);
-	hist2->SetLineWidth(3);hist2->SetMarkerStyle(kFullTriangleUp);
-	hist2->SetMarkerStyle(kFullTriangleUp);
-	hist2->SetMarkerColor(kGreen+2);
-	hist2->SetMarkerSize(3);
-	hist3->SetLineColor(kBlue+1);
-	hist3->SetLineWidth(3);
-	hist3->SetMarkerStyle(kFullTriangleDown);
-	hist3->SetMarkerColor(kBlue+1);
-	hist3->SetMarkerSize(3);
-	hist4->SetLineColor(kMagenta+2);
-	hist4->SetLineWidth(3);
-	hist4->SetMarkerStyle(kFullDiamond);
-	hist4->SetMarkerColor(kMagenta+2);
-	hist4->SetMarkerSize(3);
-	TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
-	legend->AddEntry(hist0, "0.00 < R_{9} < 0.80", "lp");
-	legend->AddEntry(hist1, "0.80 < R_{9} < 0.90", "lp");
-	legend->AddEntry(hist2, "0.90 < R_{9} < 0.92", "lp");
-	legend->AddEntry(hist3, "0.92 < R_{9} < 0.96", "lp");
-	legend->AddEntry(hist4, "0.96 < R_{9} < 1.00", "lp");
-	legend->AddEntry((TObject*)0, "2017 Conditions", "");
-    std::string temp = "#gamma/e gun: "+energy;
-	legend->AddEntry((TObject*)0, temp.c_str(), "");
-	hist0->SetYTitle("#bf{Systematics [%]}");
-	hist0->SetXTitle("#bf{|#eta|}");
-	hist0->SetAxisRange(xmin, xmax-0.000001 ,"X");
-	hist0->SetAxisRange(yMin, yMax, "Y");
-	hist0->SetLabelSize(0.035, "Y");
-	hist0->SetTitleOffset(1.10, "Y");
-	hist0->SetTitleOffset(0.66, "X");
-	hist0->SetTitleFont(42, "Y");
-	hist0->SetTitleFont(42, "X");
-	hist0->SetTitleSize(0.05, "Y");
-	hist0->SetTitleSize(0.06, "X");
-	hist0->GetXaxis()->CenterTitle();
-	hist0->Draw("E");
-	hist1->Draw("SAME E");
-	hist2->Draw("SAME E");
-	hist3->Draw("SAME E");
-	hist4->Draw("SAME E");
-    TLine * line = new TLine(xmin, 0.07, xmax, 0.07);
-    line->SetLineWidth(5);
-    line->SetLineStyle(9);
-	pave->SetNDC();
-	pave->Draw();
-	lumi_label->SetNDC();
-	lumi_label->Draw();
-	legend->SetNColumns(2);
-	legend->SetTextSize(0.04);
-	legend->SetTextFont(62);
-	legend->Draw();
-
-    if(energy.find("30") != std::string::npos) energy = "_030GeV";
-    if(energy.find("45") != std::string::npos) energy = "_045GeV";
-    if(energy.find("60") != std::string::npos) energy = "_060GeV";
-    if(energy.find("120") != std::string::npos) energy = "_120GeV";
-
-    std::string name = DIRECTORY_NAME+"/systematics_2017_"+region+energy+".pdf";
-	a_0->SaveAs(name.c_str());
-    name = DIRECTORY_NAME+"/systematics_2017_"+region+energy+".C";
-    a_0->SaveAs(name.c_str());
-    name = DIRECTORY_NAME+"/systematics_2017_"+region+energy+".png";
+    name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".png";
     a_0->SaveAs(name.c_str());
     delete line;
     delete a_0;
