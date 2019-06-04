@@ -39,7 +39,7 @@ extern std::string DIRECTORY_NAME;
 
 void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corrections){
 
-    std::cout << "begin producing look-up tables... " << std::endl;
+    std::cout << "[STATUS] begin producing look-up tables... " << std::endl;
 
 	int numR9bins = 5;
 	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
@@ -48,7 +48,7 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
 	TFile* myHistograms = new TFile(fileName.c_str(), "READ");
 
-    std::cout << "initializing histograms ... " << std::endl;
+    std::cout << "[STATUS] initializing histograms ... " << std::endl;
     
 	TH2F * mean_0 = new TH2F("mean_0", "Photon Systematics [%], 0 < R9 < 0.8", numEtaBins, etaBins, 100, 0.005, 1.005);
 	TH2F * mean_1 = new TH2F("mean_1", "Photon Systematics [%], 0.8 < R9 < 0.9", numEtaBins, etaBins, 100, 0.005, 1.005);
@@ -124,7 +124,7 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 		g_4.clear();
 	}
 
-    std::cout << "evaluating systematics ... " << std::endl;
+    std::cout << "[INFO] evaluating systematics ... " << std::endl;
 
     std::string uncertainty_low = "rootFiles/uncertainty_hists_low.root";
     std::string uncertainty_high = "rootFiles/uncertainty_hists_high.root";
@@ -239,14 +239,14 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
     myLookUpTableProducer::plot_LookUpTable( mean_EE_3, "lookUpTable_EE_R9_3", 1.566, 2.499, -0.7, 0.7);
     myLookUpTableProducer::plot_LookUpTable( mean_EE_4, "lookUpTable_EE_R9_4", 1.566, 2.499, -0.7, 0.7);
 
-    std::cout << std::endl << "look-up tables have been produced ... " << std::endl;
+    std::cout << std::endl << "[INFO] look-up tables have been produced ... " << std::endl;
 
     return;
 };
 
 void myLookUpTableProducer::produce_PionLookUpTables(std::string fileName, bool corrections){
 
-    std::cout << "begin producing look-up tables... " << std::endl;
+    std::cout << "[STATUS] begin producing look-up tables... " << std::endl;
 
 	int numR9bins = 5;
 	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
@@ -255,7 +255,7 @@ void myLookUpTableProducer::produce_PionLookUpTables(std::string fileName, bool 
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
 	TFile* myHistograms = new TFile(fileName.c_str(), "READ");
 
-    std::cout << "initializing histograms ... " << std::endl;
+    std::cout << "[STATUS] initializing histograms ... " << std::endl;
     
 	TH2F * mean_0 = new TH2F("mean_0", "Photon Systematics [%], 0 < R9 < 0.8", numEtaBins, etaBins, 100, 0.005, 1.005);
 
@@ -279,7 +279,7 @@ void myLookUpTableProducer::produce_PionLookUpTables(std::string fileName, bool 
 		g_0.clear();
 	}
 
-    std::cout << "evaluating systematics ... " << std::endl;
+    std::cout << "[STATUS] evaluating systematics ... " << std::endl;
 
 	double mean1, mean2;
 	double err1, err2;
@@ -303,14 +303,14 @@ void myLookUpTableProducer::produce_PionLookUpTables(std::string fileName, bool 
 
     myLookUpTableProducer::plot_LookUpTable( mean_EE_0, "lookUpTable_EE_R9_0", 1.566, 2.499, -0.1, 0.45);
 
-    std::cout << std::endl << "look-up tables have been produced ... " << std::endl;
+    std::cout << std::endl << "[INFO] look-up tables have been produced ... " << std::endl;
 
     return;
 };
 
 void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title, double xMin, double xMax, double zMin, double zMax){
     TCanvas * a = new TCanvas("a", "", 900, 900);
-    if( !(thisHist) ) std::cout << "uh oh" << std::endl;
+    if( !(thisHist) ) std::cout << "[ERROR] could not open historgram: " << thisHist->GetName() << std::endl;
     a->cd();
     gStyle->SetPalette(kBird);
     gStyle->SetOptStat(0);

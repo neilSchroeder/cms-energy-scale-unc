@@ -33,14 +33,15 @@
 #include "../interface/frameworkHistogramProducer.h"
 
 //#define ETA_VETO
+//#define EVENT_INFO
 
-std::string DIRECTORY_NAME = "photonSystematics";
+extern std::string DIRECTORY_NAME; 
 
 /// Produce FNUF Histograms only analyzes two files at a time
 void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::string pho_file, std::string outputFileName, std::string outputDirectoryName){
     std::string ret = "";
 
-    std::cout << "Electron File: " << ele_file << "\nPhoton File: " << pho_file << std::endl;
+    std::cout << "[INFO] Electron File: " << ele_file << "\n[INFO] Photon File: " << pho_file << std::endl;
 
 	//declare some constants
 	int numR9bins = 5;
@@ -322,14 +323,14 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                     }//end for tree index
                 }// end if found key named ntuples
                 else{
-                    std::cout << "Did not find directory 'ntuples' for file " << rootFile << std::endl;
-                    std::cout << "... continuing without this file." << std::endl;
+                    std::cout << "[ERROR] Did not find directory 'ntuples' for file " << rootFile << std::endl;
+                    std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
                 }
             }//end while keys
         }//end if not zombie
         else{
-            std::cout << "The file " << ele_file << " did not open properly" << std::endl;
-            std::cout << "... continuing without this file." << std::endl;
+            std::cout << "[ERROR] The file " << ele_file << " did not open properly" << std::endl;
+            std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
         }
         myFile->Close();
     }//end while files in
@@ -461,14 +462,14 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                     }//end for tree index
                 }//end if key == ntuples
                 else{
-                    std::cout << "Did not find directory 'ntuples' for file " << rootFile << std::endl;
-                    std::cout << "... continuing without this file." << std::endl;
+                    std::cout << "[ERROR] Did not find directory 'ntuples' for file " << rootFile << std::endl;
+                    std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
                 }
             }//end while keys
         }//end if is zombie
         else{
-            std::cout << "The file " << pho_file << " did not open correctly" << std::endl;
-            std::cout << "... continuing without this file." << std::endl;
+            std::cout << "[ERROR] The file " << pho_file << " did not open correctly" << std::endl;
+            std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
         }
         myFile->Close();
     }//end while files in
@@ -480,16 +481,16 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
     DIRECTORY_NAME = outputDirectoryName;
     
     
+    std::cout << "[EXECUTE] source ./clean_up_directories.sh "+DIRECTORY_NAME << std::endl;
     system(std::string("source ./clean_up_directories.sh "+DIRECTORY_NAME).c_str());
-    std::cout << "source ./clean_up_directories.sh "+DIRECTORY_NAME << std::endl;
     //////////////////////////////////////////////////////
     
     std::string fileOut = DIRECTORY_NAME+outputFileName;
     if(fileOut.find(".root") == std::string::npos) fileOut = fileOut+".root";
 
 
-    std::cout<< "files successfully analyzed... " << std::endl;
-    std::cout<< "begin writing to file `"<< fileOut << "' ..." << std::endl;
+    std::cout<< "[INFO] files successfully analyzed... " << std::endl;
+    std::cout<< "[INFO] begin writing to file `"<< fileOut << "' ..." << std::endl;
 
 	//////////////////////////////////////////////////////
 
@@ -507,6 +508,26 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             Histogramsg_2[i][j]->Write();
             Histogramsg_3[i][j]->Write();
             Histogramsg_4[i][j]->Write();
+#ifdef EVENT_INFO            
+            if(j == 0){
+
+                std::cout << "[EVENT INFO] there are " << Histogramse_0[i][j]->GetEntries() + Histogramse_1[i][j]->GetEntries() + Histogramse_2[i][j]->GetEntries() + Histogramse_3[i][j]->GetEntries() + Histogramse_4[i][j]->GetEntries() << " electrons in the bin eta = " << i << std::endl;
+
+                std::cout << "[EVENT INFO] there are " << Histogramse_0[i][j]->GetEntries() << " electrons in the (r9, eta) bin (0, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramse_1[i][j]->GetEntries() << " electrons in the (r9, eta) bin (1, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramse_2[i][j]->GetEntries() << " electrons in the (r9, eta) bin (2, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramse_3[i][j]->GetEntries() << " electrons in the (r9, eta) bin (3, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramse_4[i][j]->GetEntries() << " electrons in the (r9, eta) bin (4, "<<i<<") " << std::endl;
+
+                std::cout << "[EVENT INFO] there are " << Histogramsg_0[i][j]->GetEntries() + Histogramsg_1[i][j]->GetEntries() + Histogramsg_2[i][j]->GetEntries() + Histogramsg_3[i][j]->GetEntries() + Histogramsg_4[i][j]->GetEntries() << " photons in the bin eta = " << i << std::endl;
+
+                std::cout << "[EVENT INFO] there are " << Histogramsg_0[i][j]->GetEntries() << " photons in the (r9, eta) bin (0, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramsg_1[i][j]->GetEntries() << " photons in the (r9, eta) bin (1, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramsg_2[i][j]->GetEntries() << " photons in the (r9, eta) bin (2, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramsg_3[i][j]->GetEntries() << " photons in the (r9, eta) bin (3, "<<i<<") " << std::endl;
+                std::cout << "[EVENT INFO] there are " << Histogramsg_4[i][j]->GetEntries() << " photons in the (r9, eta) bin (4, "<<i<<") " << std::endl;
+            }
+#endif 
         }
     }
 
@@ -525,7 +546,7 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             delete Histogramsg_4[i][j];
         }
     }
-    std::cout << "finished writing to file... " << std::endl;
+    std::cout << "[STATUS] finished writing to file... " << std::endl;
 	return;
 };
 

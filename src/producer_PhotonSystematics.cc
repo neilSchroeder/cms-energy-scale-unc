@@ -26,29 +26,32 @@
 #include "../interface/frameworkHistogramProducer.h"
 #include "../interface/frameworkLUTproducer.h"
 #include "../interface/frameworkSystematicsPlotter.h"
+#include "TFile.h"
 #include <iostream>
 #include "boost/program_options.hpp"
 
+std::string DIRECTORY_NAME = "fnuf_systematics";
 int main( int argc, char **argv ){
     using namespace boost;
     namespace opts = boost::program_options;
 
     std::string eleInputFile;
     std::string phoInputFile;
-    std::string rootFileOut;
-    std::string outDir;
-    bool        boostedSystematics;
-    bool        usingPions;
+    std::string rootFileOut = "fnuf_systematics_out";
+    bool        boostedSystematics = 1;
+    bool        usingPions = 0;
+    bool        force = 0;
 
     opts::options_description desc("Main Options");
     
     desc.add_options()
         ("eleInputFile", opts::value<std::string>(&eleInputFile), "Electron Input File")
         ("phoInputFile", opts::value<std::string>(&phoInputFile), "Photon Input File")
-        ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output Root File Name")
-        ("outDir", opts::value<std::string>(&outDir), "Output Directory")
-        ("boostedSystematics", opts::value<bool>(&boostedSystematics), "Boost systematics to cover method uncertainties")
-        ("usingPions", opts::value<bool>(&usingPions), "If you are using pions instead of photons for this production, enable this option");        
+        ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output Root File Name (default is 'fnuf_systematics_out')")
+        ("outDir", opts::value<std::string>(&DIRECTORY_NAME), "Output Directory (default is 'fnuf_systematics')")
+        ("boostedSystematics", opts::value<bool>(&boostedSystematics), "Boost systematics to cover method uncertainties (default is 1)")
+        ("usingPions", opts::value<bool>(&usingPions), "If you are using pions instead of photons for this production, enable this option (default is 0)");        
+        ("force", opts::value<bool>(&force), "If you want to reproduce your root file, turn this option on (default is 0)");        
     ;
 
     if( usingPions ) std::cout << "You are using pions" << std::endl;
@@ -61,10 +64,17 @@ int main( int argc, char **argv ){
     myLookUpTableProducer table_producer;
     mySystematicsPlotter syst_plotter;
 
-    if( usingPions ) hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
-    else hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, outDir);
 
-    rootFileOut = outDir+rootFileOut;
+    if( usingPions ) hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+    else{
+        std::string temp_filename = DIRECTORY_NAME+rootFileOut+".root";
+        std::cout << temp_filename << std::endl;
+        TFile * file_exists = TFile::Open(temp_filename.c_str(),"READ");
+        
+        if(!file_exists || force) hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+    }
+
+    rootFileOut = DIRECTORY_NAME+rootFileOut;
     if(rootFileOut.find(".root") == std::string::npos) rootFileOut = rootFileOut+".root";
 
     if( usingPions ){
