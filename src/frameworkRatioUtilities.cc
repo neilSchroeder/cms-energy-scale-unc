@@ -228,7 +228,7 @@ std::string myUtilities::produce_FNUF_Histograms( char ** cLineArgs, int i ){
                         if( dr[0] != 999 && dr[1] != 999){
                             //determine which eta bin the first electron falls into
                             int etaIndex1 = fabs(etaSC[0])/(2.5/(double)numEtaBins);
-                            int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);;
+                            int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);
                             for(int i = 0; i < numEtaBins - 1 ; i++){
                                 if( fabs(etaSC[0]) > etaBins[i] && fabs(etaSC[0]) < etaBins[i+1]){
                                     etaIndex1 = i;

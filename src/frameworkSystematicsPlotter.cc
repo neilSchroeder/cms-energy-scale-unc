@@ -52,6 +52,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 
     int numEtaBins = 8;
     double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+    double etaBins_center[7] = {0.15, 0.5, 0.9, 1.2721, 1.687, 1.95, 2.3};
 
     //begin making the necessary histograms
     std::vector< std::vector<TH1F*> > systematics;
@@ -156,7 +157,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
         uncertainty_high = "rootFiles/uncertainty_hists_high_120.root";
         uncertainty_frontDown = "rootFiles/uncertainty_hists_frontDown_120.root";
     }
-    
+
     TFile * correction_low = new TFile(uncertainty_low.c_str(), "READ");
     TFile * correction_high = new TFile(uncertainty_high.c_str(), "READ");
     TFile * correction_front = new TFile(uncertainty_frontDown.c_str(), "READ");
@@ -265,43 +266,43 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
             int bin = j;
             if(j != 4){
                 if(j > 4) bin = j-1;
-            switch( i ){
-                case 0:
-                    systematics2016_0->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
-                    systematics2017_0->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
-                    systematics2018_0->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
-                    systematics2016_0->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
-                    systematics2017_0->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
-                    systematics2018_0->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
-                case 1:
-                    systematics2016_1->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
-                    systematics2017_1->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
-                    systematics2018_1->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
-                    systematics2016_1->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
-                    systematics2017_1->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
-                    systematics2018_1->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
-                case 2:
-                    systematics2016_2->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
-                    systematics2017_2->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
-                    systematics2018_2->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
-                    systematics2016_2->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
-                    systematics2017_2->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
-                    systematics2018_2->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
-                case 3:
-                    systematics2016_3->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
-                    systematics2017_3->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
-                    systematics2018_3->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
-                    systematics2016_3->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
-                    systematics2017_3->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
-                    systematics2018_3->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
-                case 4:
-                    systematics2016_4->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
-                    systematics2017_4->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
-                    systematics2018_4->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
-                    systematics2016_4->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
-                    systematics2017_4->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
-                    systematics2018_4->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
-            }
+                switch( i ){
+                    case 0:
+                        systematics2016_0->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
+                        systematics2017_0->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
+                        systematics2018_0->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
+                        systematics2016_0->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
+                        systematics2017_0->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
+                        systematics2018_0->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
+                    case 1:
+                        systematics2016_1->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
+                        systematics2017_1->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
+                        systematics2018_1->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
+                        systematics2016_1->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
+                        systematics2017_1->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
+                        systematics2018_1->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
+                    case 2:
+                        systematics2016_2->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
+                        systematics2017_2->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
+                        systematics2018_2->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
+                        systematics2016_2->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
+                        systematics2017_2->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
+                        systematics2018_2->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
+                    case 3:
+                        systematics2016_3->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
+                        systematics2017_3->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
+                        systematics2018_3->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
+                        systematics2016_3->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
+                        systematics2017_3->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
+                        systematics2018_3->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
+                    case 4:
+                        systematics2016_4->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
+                        systematics2017_4->SetBinContent(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinContent(j+1));
+                        systematics2018_4->SetBinContent(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinContent(j+1));
+                        systematics2016_4->SetBinError(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinError(j+1));
+                        systematics2017_4->SetBinError(j+1, systematics[laserResponseBins_2017[bin]][i]->GetBinError(j+1));
+                        systematics2018_4->SetBinError(j+1, systematics[laserResponseBins_2018[bin]][i]->GetBinError(j+1));
+                }
             }
         }
     }
@@ -315,55 +316,55 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     if(fileName.find("045") != std::string::npos) energy = "_45GeV";
     if(fileName.find("060") != std::string::npos) energy = "_60GeV";
     if(fileName.find("120") != std::string::npos) energy = "_120GeV";
-    std::string textFileName = fileOutPre+energy+".txt";
+    std::string textFileName = fileOutPre+energy+".dat";
     out.open(textFileName.c_str(), std::ofstream::out | std::ofstream::trunc);
     //the first printed line in the text file follows and describes the binning of scheme
-    out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge laser_response systematic statUnc" << std::endl;
+    out << "#eta_center eta_low_edge eta_high_edge r9_low_edge r9_high_edge laser_response systematic" << std::endl;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < numR9bins; j++){
-            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laser_response_2016[i] << " "  << systematics[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
+            out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laser_response_2016[i] << " "  << systematics[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
         }
     }
     for(int i = 5; i < 8; i++){
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laser_response_2016[i-1] << " " << systematics2016_0->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laser_response_2016[i-1] << " " << systematics2016_1->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laser_response_2016[i-1] << " " << systematics2016_2->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laser_response_2016[i-1] << " " << systematics2016_3->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laser_response_2016[i-1] << " " << systematics2016_4->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laser_response_2016[i-1] << " " << systematics2016_0->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laser_response_2016[i-1] << " " << systematics2016_1->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laser_response_2016[i-1] << " " << systematics2016_2->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laser_response_2016[i-1] << " " << systematics2016_3->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laser_response_2016[i-1] << " " << systematics2016_4->GetBinContent(i+1) << std::endl;
     }
     out.close();
     fileOutPre = DIRECTORY_NAME+"/fnuf_systematics_2017";
-    textFileName = fileOutPre+energy+".txt";
+    textFileName = fileOutPre+energy+".dat";
     out.open(textFileName.c_str(), std::ofstream::out | std::ofstream::trunc);
-    out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge systematic" << std::endl;
+    out << "#eta_low_edge eta_high_edge r9_low_edge r9_high_edge laser_response systematic" << std::endl;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < numR9bins; j++){
-            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laser_response_2017[i] << " " << systematics[laserResponseBins_2017[i]][j]->GetBinContent(i+1) << std::endl;
+            out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laser_response_2017[i] << " " << systematics[laserResponseBins_2017[i]][j]->GetBinContent(i+1) << std::endl;
         }
     }
     for(int i = 5; i < 8; i++){
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laser_response_2017[i-1] << " " << systematics2017_0->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laser_response_2017[i-1] << " " << systematics2017_1->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laser_response_2017[i-1] << " " << systematics2017_2->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laser_response_2017[i-1] << " " << systematics2017_3->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laser_response_2017[i-1] << " " << systematics2017_4->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laser_response_2017[i-1] << " " << systematics2017_0->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laser_response_2017[i-1] << " " << systematics2017_1->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laser_response_2017[i-1] << " " << systematics2017_2->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laser_response_2017[i-1] << " " << systematics2017_3->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laser_response_2017[i-1] << " " << systematics2017_4->GetBinContent(i+1) << std::endl;
     }
     out.close();
     fileOutPre = DIRECTORY_NAME+"/fnuf_systematics_2018";
-    textFileName = fileOutPre+energy+".txt";
+    textFileName = fileOutPre+energy+".dat";
     out.open(textFileName.c_str(), std::ofstream::out | std::ofstream::trunc);
-    out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge systematic" << std::endl;
+    out << "eta_low_edge eta_high_edge r9_low_edge r9_high_edge laser_response systematic" << std::endl;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < numR9bins; j++){
-            out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laserResponseBins_2018[i] << " " << systematics[laserResponseBins_2018[i]][j]->GetBinContent(i+1) << std::endl;
+            out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << laserResponseBins_2018[i] << " " << systematics[laserResponseBins_2018[i]][j]->GetBinContent(i+1) << std::endl;
         }
     }
     for(int i = 5; i < 8; i++){
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_0->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_1->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_2->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_3->GetBinContent(i+1) << std::endl;
-        out << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_4->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_0->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_1->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_2->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_3->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << laserResponseBins_2018[i-1] << " " << systematics2018_4->GetBinContent(i+1) << std::endl;
     }
     out.close();
 
@@ -379,10 +380,225 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     mySystematicsPlotter::plot_year(systematics2017_0, systematics2017_1, systematics2017_2, systematics2017_3, systematics2017_4, "2017", energy, region, -999, -999);
     mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -999, -999);
 
+
     region = "EE";
     mySystematicsPlotter::plot_year(systematics2016_0, systematics2016_1, systematics2016_2, systematics2016_3, systematics2016_4, "2016", energy, region, -0.02, -999);
     mySystematicsPlotter::plot_year(systematics2017_0, systematics2017_1, systematics2017_2, systematics2017_3, systematics2017_4, "2017", energy, region, -0.02, -999);
     mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -0.02, -999);
+
+    region = "combined";
+    mySystematicsPlotter::plot_year(systematics2016_0, systematics2016_1, systematics2016_2, systematics2016_3, systematics2016_4, "2016", energy, region, -999, -999);
+    mySystematicsPlotter::plot_year(systematics2017_0, systematics2017_1, systematics2017_2, systematics2017_3, systematics2017_4, "2017", energy, region, -999, -999);
+    mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -999, -999);
+
+    return;
+};
+
+
+void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, TH1F * hist3, TH1F * hist4, std::string year, std::string energy, std::string region, double yMin, double yMax){
+    double xmin = 0;
+    double xmax = 2.4999999;
+    if( region.find("EB") != std::string::npos ) xmax = 1.4;
+    if( region.find("EE") != std::string::npos ) xmin = 1.57;
+
+    if(!hist0){
+        std::cout << "[ERROR] the histogram named " << hist0->GetName() << " was provided as hist0, but is not a valid pointer" << std::endl;
+        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
+        return;
+    }
+    if(!hist1){
+        std::cout << "[ERROR] the histogram named " << hist1->GetName() << " was provided as hist1, but is not a valid pointer" << std::endl;
+        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
+        return;
+    }
+    if(!hist2){
+        std::cout << "[ERROR] the histogram named " << hist2->GetName() << " was provided as hist2, but is not a valid pointer" << std::endl;
+        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
+        return;
+    }
+    if(!hist3){
+        std::cout << "[ERROR] the histogram named " << hist3->GetName() << " was provided as hist3, but is not a valid pointer" << std::endl;
+        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
+        return;
+    }
+    if(!hist4){
+        std::cout << "[ERROR] the histogram named " << hist4->GetName() << " was provided as hist4, but is not a valid pointer" << std::endl;
+        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
+        return;
+    }
+
+    if(yMax == -999){
+        std::vector<double> myMax;
+        if(region.find("EE") != std::string::npos){
+            for(int i = 5; i < 9; i++){
+                myMax.push_back((double)hist0->GetBinContent(i));
+                myMax.push_back((double)hist1->GetBinContent(i));
+                myMax.push_back((double)hist2->GetBinContent(i));
+                myMax.push_back((double)hist3->GetBinContent(i));
+                myMax.push_back((double)hist4->GetBinContent(i));
+            }
+        }
+        if(region.find("EB") != std::string::npos){
+            for(int i = 0; i < 4; i++){
+                myMax.push_back((double)hist0->GetBinContent(i));
+                myMax.push_back((double)hist1->GetBinContent(i));
+                myMax.push_back((double)hist2->GetBinContent(i));
+                myMax.push_back((double)hist3->GetBinContent(i));
+                myMax.push_back((double)hist4->GetBinContent(i));
+            }
+
+        }
+        if(region.find("combined") != std::string::npos){
+            for(int i = 0; i < 9; i++){
+                myMax.push_back((double)hist0->GetBinContent(i));
+                myMax.push_back((double)hist1->GetBinContent(i));
+                myMax.push_back((double)hist2->GetBinContent(i));
+                myMax.push_back((double)hist3->GetBinContent(i));
+                myMax.push_back((double)hist4->GetBinContent(i));
+            }
+        }
+        yMax = *std::max_element(myMax.begin(), myMax.end());
+        yMax *= 1.5;
+    }
+    if(yMin == -999){
+        std::vector<double> myMin;
+        if(region.find("EE") != std::string::npos){
+            for(int i = 5; i < 9; i++){
+                myMin.push_back((double)hist0->GetBinContent(i));
+                myMin.push_back((double)hist1->GetBinContent(i));
+                myMin.push_back((double)hist2->GetBinContent(i));
+                myMin.push_back((double)hist3->GetBinContent(i));
+                myMin.push_back((double)hist4->GetBinContent(i));
+            }
+        }
+        if(region.find("EB") != std::string::npos){
+            for(int i = 0; i < 4; i++){
+                myMin.push_back((double)hist0->GetBinContent(i));
+                myMin.push_back((double)hist1->GetBinContent(i));
+                myMin.push_back((double)hist2->GetBinContent(i));
+                myMin.push_back((double)hist3->GetBinContent(i));
+                myMin.push_back((double)hist4->GetBinContent(i));
+            }
+        }
+        if(region.find("combined") != std::string::npos){
+            for(int i = 0; i < 9; i++){
+                myMin.push_back((double)hist0->GetBinContent(i));
+                myMin.push_back((double)hist1->GetBinContent(i));
+                myMin.push_back((double)hist2->GetBinContent(i));
+                myMin.push_back((double)hist3->GetBinContent(i));
+                myMin.push_back((double)hist4->GetBinContent(i));
+            }
+        }
+        yMin = *std::min_element(myMin.begin(), myMin.end());
+        yMin *= 1.3;
+    }
+
+    gStyle->SetPalette(kBird);
+    gStyle->SetOptStat(0);
+    gStyle->SetOptTitle(0);
+    gStyle->SetPaintTextFormat("0.2f");
+
+    TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
+    TLatex* lumi_label = new TLatex(0.97, 0.91, "#font[42]{13 TeV}");
+    lumi_label->SetTextAlign(31);
+    TCanvas * a_0;
+    if(region.compare("EB") == 0 || region.compare("EE") == 0) a_0 = new TCanvas("a0", "", 1200, 1200);
+    else a_0 = new TCanvas("a_0", "", 1600, 1200);
+    a_0->cd();
+    gPad->SetRightMargin(0.03);
+    gPad->SetLeftMargin(0.125);
+    gPad->SetGridy(1);
+    gPad->SetGridx(1);
+
+    hist0->SetLineColor(kRed);
+    hist0->SetLineWidth(3);
+    hist0->SetMarkerStyle(kFullCircle);
+    hist0->SetMarkerColor(kRed);
+    hist0->SetMarkerSize(3);
+    hist1->SetLineColor(kOrange+7);
+    hist1->SetLineWidth(3);
+    hist1->SetMarkerStyle(kFullSquare);
+    hist1->SetMarkerColor(kOrange+7);
+    hist1->SetMarkerSize(3);
+    hist2->SetLineColor(kGreen+2);
+    hist2->SetLineWidth(3);
+    hist2->SetMarkerStyle(kFullTriangleUp);
+    hist2->SetMarkerColor(kGreen+2);
+    hist2->SetMarkerSize(3);
+    hist3->SetLineColor(kBlue+1);
+    hist3->SetLineWidth(3);
+    hist3->SetMarkerStyle(kFullTriangleDown);
+    hist3->SetMarkerColor(kBlue+1);
+    hist3->SetMarkerSize(3);
+    hist4->SetLineColor(kMagenta+2);
+    hist4->SetLineWidth(3);
+    hist4->SetMarkerStyle(kFullDiamond);
+    hist4->SetMarkerColor(kMagenta+2);
+    hist4->SetMarkerSize(3);
+
+
+    TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
+    legend->AddEntry(hist0, "0.00 < R_{9} < 0.80", "lp");
+    legend->AddEntry(hist1, "0.80 < R_{9} < 0.90", "lp");
+    legend->AddEntry(hist2, "0.90 < R_{9} < 0.92", "lp");
+    legend->AddEntry(hist3, "0.92 < R_{9} < 0.96", "lp");
+    legend->AddEntry(hist4, "0.96 < R_{9} < 1.00", "lp");
+    std::string temp = year+" Conditions";
+    legend->AddEntry((TObject*)0, temp.c_str(), "");
+    temp = "#gamma/e: " + energy;
+    legend->AddEntry((TObject*)0, temp.c_str(), "");
+
+
+    hist0->SetYTitle("#bf{#gamma/e Energy Scale Relative Difference (%)}");
+    hist0->SetXTitle("#bf{|#eta|}");
+    hist0->SetAxisRange(yMin, yMax, "Y");
+
+    if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
+    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
+    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, 8);}
+
+    hist0->SetLabelSize(0.035, "Y");
+    hist0->SetTitleOffset(1.40, "Y");
+    hist0->SetTitleOffset(0.76, "X");
+    hist0->SetTitleFont(42, "Y");
+    hist0->SetTitleFont(42, "X");
+    hist0->SetTitleSize(0.04, "Y");
+    hist0->SetTitleSize(0.05, "X");
+    hist0->Draw("E");
+    hist1->Draw("SAME E");
+    hist2->Draw("SAME E");
+    hist3->Draw("SAME E");
+    hist4->Draw("SAME E");
+    TLine * line = new TLine(xmin, 0.07, xmax, 0.07);
+    line->SetLineWidth(5);
+    line->SetLineStyle(9);
+    TBox * excludeTransition = new TBox(1.4442, yMin, 1.57, yMax);
+    excludeTransition->SetFillStyle(3002);
+    excludeTransition->SetFillColor(kBlack);
+    excludeTransition->SetLineColor(kBlack);
+    if(region.compare("combined") == 0) excludeTransition->Draw("same");
+    pave->SetNDC();
+    pave->Draw();
+    lumi_label->SetNDC();
+    lumi_label->Draw();
+    legend->SetNColumns(2);
+    legend->SetTextSize(0.04);
+    legend->SetTextFont(62);
+    legend->Draw();
+
+    if(energy.find("30") != std::string::npos) energy = "_030GeV";
+    if(energy.find("45") != std::string::npos) energy = "_045GeV";
+    if(energy.find("60") != std::string::npos) energy = "_060GeV";
+    if(energy.find("120") != std::string::npos) energy = "_120GeV";
+
+    std::string name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".pdf";
+    a_0->SaveAs(name.c_str());
+    name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".C";
+    a_0->SaveAs(name.c_str());
+    name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".png";
+    a_0->SaveAs(name.c_str());
+    delete line;
+    delete a_0;
     return;
 };
 
@@ -524,233 +740,60 @@ void mySystematicsPlotter::produce_2016_2017_PionPlots(std::string fileName, boo
     return;
 };
 
-void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, TH1F * hist3, TH1F * hist4, std::string year, std::string energy, std::string region, double yMin, double yMax){
-    double xmin = 0;
-    double xmax = 2.4999999;
-    if( region.find("EB") != std::string::npos ) xmax = 1.4;
-    if( region.find("EE") != std::string::npos ) xmin = 1.57;
-
-    if(!hist0){
-        std::cout << "[ERROR] the histogram named " << hist0->GetName() << " was provided as hist0, but is not a valid pointer" << std::endl;
-        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
-        return;
-    }
-    if(!hist1){
-        std::cout << "[ERROR] the histogram named " << hist1->GetName() << " was provided as hist1, but is not a valid pointer" << std::endl;
-        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
-        return;
-    }
-    if(!hist2){
-        std::cout << "[ERROR] the histogram named " << hist2->GetName() << " was provided as hist2, but is not a valid pointer" << std::endl;
-        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
-        return;
-    }
-    if(!hist3){
-        std::cout << "[ERROR] the histogram named " << hist3->GetName() << " was provided as hist3, but is not a valid pointer" << std::endl;
-        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
-        return;
-    }
-    if(!hist4){
-        std::cout << "[ERROR] the histogram named " << hist4->GetName() << " was provided as hist4, but is not a valid pointer" << std::endl;
-        std::cout << "[ERROR] cannot recover, moving past this... " << std::endl;
-        return;
-    }
-
-    if(yMax == -999){
-        std::vector<double> myMax;
-        if(region.find("EE") != std::string::npos){
-            for(int i = 5; i < 9; i++){
-                myMax.push_back((double)hist0->GetBinContent(i));
-                myMax.push_back((double)hist1->GetBinContent(i));
-                myMax.push_back((double)hist2->GetBinContent(i));
-                myMax.push_back((double)hist3->GetBinContent(i));
-                myMax.push_back((double)hist4->GetBinContent(i));
-            }
-        }
-        if(region.find("EB") != std::string::npos){
-            for(int i = 0; i < 4; i++){
-                myMax.push_back((double)hist0->GetBinContent(i));
-                myMax.push_back((double)hist1->GetBinContent(i));
-                myMax.push_back((double)hist2->GetBinContent(i));
-                myMax.push_back((double)hist3->GetBinContent(i));
-                myMax.push_back((double)hist4->GetBinContent(i));
-            }
-        
-        }
-        yMax = *std::max_element(myMax.begin(), myMax.end());
-        yMax *= 1.5;
-    }
-    if(yMin == -999){
-        std::vector<double> myMin;
-        if(region.find("EE") != std::string::npos){
-            for(int i = 5; i < 9; i++){
-                myMin.push_back((double)hist0->GetBinContent(i));
-                myMin.push_back((double)hist1->GetBinContent(i));
-                myMin.push_back((double)hist2->GetBinContent(i));
-                myMin.push_back((double)hist3->GetBinContent(i));
-                myMin.push_back((double)hist4->GetBinContent(i));
-            }
-        }
-        if(region.find("EB") != std::string::npos){
-            for(int i = 0; i < 4; i++){
-                myMin.push_back((double)hist0->GetBinContent(i));
-                myMin.push_back((double)hist1->GetBinContent(i));
-                myMin.push_back((double)hist2->GetBinContent(i));
-                myMin.push_back((double)hist3->GetBinContent(i));
-                myMin.push_back((double)hist4->GetBinContent(i));
-            }
-        
-        }
-        yMin = *std::min_element(myMin.begin(), myMin.end());
-        yMin *= 1.3;
-    }
-
-	gStyle->SetPalette(kBird);
-	gStyle->SetOptStat(0);
-	gStyle->SetOptTitle(0);
-	gStyle->SetPaintTextFormat("0.2f");
-
-	TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
-	TLatex* lumi_label = new TLatex(0.822, 0.91, "#font[42]{13 TeV}");
-	TCanvas * a_0 = new TCanvas("a0", "", 900, 900);
-	a_0->cd();
-	gPad->SetRightMargin(0.03);
-	gPad->SetLeftMargin(0.125);
-	gPad->SetGridy(1);
-	gPad->SetGridx(1);
-	hist0->SetLineColor(kRed);
-	hist0->SetLineWidth(3);
-	hist0->SetMarkerStyle(kFullCircle);
-	hist0->SetMarkerColor(kRed);
-	hist0->SetMarkerSize(3);
-	hist1->SetLineColor(kOrange+7);
-	hist1->SetLineWidth(3);
-	hist1->SetMarkerStyle(kFullSquare);
-	hist1->SetMarkerColor(kOrange+7);
-	hist1->SetMarkerSize(3);
-	hist2->SetLineColor(kGreen+2);
-	hist2->SetLineWidth(3);
-	hist2->SetMarkerStyle(kFullTriangleUp);
-	hist2->SetMarkerColor(kGreen+2);
-	hist2->SetMarkerSize(3);
-	hist3->SetLineColor(kBlue+1);
-	hist3->SetLineWidth(3);
-	hist3->SetMarkerStyle(kFullTriangleDown);
-	hist3->SetMarkerColor(kBlue+1);
-	hist3->SetMarkerSize(3);
-	hist4->SetLineColor(kMagenta+2);
-	hist4->SetLineWidth(3);
-	hist4->SetMarkerStyle(kFullDiamond);
-	hist4->SetMarkerColor(kMagenta+2);
-	hist4->SetMarkerSize(3);
-	TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
-	legend->AddEntry(hist0, "0.00 < R_{9} < 0.80", "lp");
-	legend->AddEntry(hist1, "0.80 < R_{9} < 0.90", "lp");
-	legend->AddEntry(hist2, "0.90 < R_{9} < 0.92", "lp");
-	legend->AddEntry(hist3, "0.92 < R_{9} < 0.96", "lp");
-	legend->AddEntry(hist4, "0.96 < R_{9} < 1.00", "lp");
-    std::string temp = year+" Conditions";
-	legend->AddEntry((TObject*)0, temp.c_str(), "");
-    temp = "#gamma/e gun: " + energy;
-	legend->AddEntry((TObject*)0, temp.c_str(), "");
-	hist0->SetYTitle("#bf{Systematics [%]}");
-	hist0->SetXTitle("#bf{|#eta|}");
-	hist0->SetAxisRange(yMin, yMax, "Y");
-	if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
-	if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
-	hist0->SetLabelSize(0.035, "Y");
-	hist0->SetTitleOffset(1.10, "Y");
-	hist0->SetTitleOffset(0.66, "X");
-	hist0->SetTitleFont(42, "Y");
-	hist0->SetTitleFont(42, "X");
-	hist0->SetTitleSize(0.05, "Y");
-	hist0->SetTitleSize(0.06, "X");
-	hist0->Draw("E");
-	hist1->Draw("SAME E");
-	hist2->Draw("SAME E");
-	hist3->Draw("SAME E");
-	hist4->Draw("SAME E");
-    TLine * line = new TLine(xmin, 0.07, xmax, 0.07);
-    line->SetLineWidth(5);
-    line->SetLineStyle(9);
-	pave->SetNDC();
-	pave->Draw();
-	lumi_label->SetNDC();
-	lumi_label->Draw();
-	legend->SetNColumns(2);
-	legend->SetTextSize(0.04);
-	legend->SetTextFont(62);
-	legend->Draw();
-
-    if(energy.find("30") != std::string::npos) energy = "_030GeV";
-    if(energy.find("45") != std::string::npos) energy = "_045GeV";
-    if(energy.find("60") != std::string::npos) energy = "_060GeV";
-    if(energy.find("120") != std::string::npos) energy = "_120GeV";
-
-    std::string name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".pdf";
-	a_0->SaveAs(name.c_str());
-    name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".C";
-    a_0->SaveAs(name.c_str());
-    name = DIRECTORY_NAME+"/systematics_"+year+"_"+region+energy+".png";
-    a_0->SaveAs(name.c_str());
-    delete line;
-    delete a_0;
-    return;
-};
-
 void mySystematicsPlotter::plot_Pion2016( TH1F * hist0, std::string energy, std::string region, double yMin, double yMax){
     double xmin = 0;
     double xmax = 2.4999999;
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
     if( region.find("EE") != std::string::npos ) xmin = 1.57;
 
-	gStyle->SetPalette(kBird);
-	gStyle->SetOptStat(0);
-	gStyle->SetOptTitle(0);
-	gStyle->SetPaintTextFormat("0.2f");
+    gStyle->SetPalette(kBird);
+    gStyle->SetOptStat(0);
+    gStyle->SetOptTitle(0);
+    gStyle->SetPaintTextFormat("0.2f");
 
-	TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
-	TLatex* lumi_label = new TLatex(0.822, 0.91, "#font[42]{13 TeV}");
-	TCanvas * a_0 = new TCanvas("a0", "", 900, 900);
-	a_0->cd();
-	gPad->SetRightMargin(0.03);
-	gPad->SetLeftMargin(0.125);
-	gPad->SetGridy(1);
-	gPad->SetGridx(1);
-	hist0->SetLineColor(kBlack);
-	hist0->SetLineWidth(3);
-	hist0->SetMarkerStyle(kFullCircle);
-	hist0->SetMarkerColor(kBlack);
-	hist0->SetMarkerSize(3);
-	TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
-	legend->AddEntry(hist0, "Pion Systematics", "lp");
-	legend->AddEntry((TObject*)0, "2016 Conditions", "");
-    std::string temp = "#gamma/e gun: " + energy;
-	legend->AddEntry((TObject*)0, temp.c_str(), "");
-	hist0->SetYTitle("#bf{Systematics [%]}");
-	hist0->SetXTitle("#bf{|#eta|}");
-	hist0->SetAxisRange(yMin, yMax, "Y");
-	if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
-	if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
-	hist0->SetLabelSize(0.035, "Y");
-	hist0->SetTitleOffset(1.10, "Y");
-	hist0->SetTitleOffset(0.66, "X");
-	hist0->SetTitleFont(42, "Y");
-	hist0->SetTitleFont(42, "X");
-	hist0->SetTitleSize(0.05, "Y");
-	hist0->SetTitleSize(0.06, "X");
-	hist0->Draw("E");
+    TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
+    TLatex* lumi_label = new TLatex(0.822, 0.91, "#font[42]{13 TeV}");
+    TCanvas * a_0 = new TCanvas("a0", "", 900, 900);
+    a_0->cd();
+    gPad->SetRightMargin(0.03);
+    gPad->SetLeftMargin(0.125);
+    gPad->SetGridy(1);
+    gPad->SetGridx(1);
+    hist0->SetLineColor(kBlack);
+    hist0->SetLineWidth(3);
+    hist0->SetMarkerStyle(kFullCircle);
+    hist0->SetMarkerColor(kBlack);
+    hist0->SetMarkerSize(3);
+    TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
+    legend->AddEntry(hist0, "Pion Systematics", "lp");
+    legend->AddEntry((TObject*)0, "2016 Conditions", "");
+    std::string temp = "#gamma/e: " + energy;
+    legend->AddEntry((TObject*)0, temp.c_str(), "");
+    hist0->SetYTitle("#bf{Systematics [%]}");
+    hist0->SetXTitle("#bf{|#eta|}");
+    hist0->SetAxisRange(yMin, yMax, "Y");
+    if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
+    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
+    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(0, 8);}
+    hist0->SetLabelSize(0.035, "Y");
+    hist0->SetTitleOffset(1.10, "Y");
+    hist0->SetTitleOffset(0.66, "X");
+    hist0->SetTitleFont(42, "Y");
+    hist0->SetTitleFont(42, "X");
+    hist0->SetTitleSize(0.05, "Y");
+    hist0->SetTitleSize(0.06, "X");
+    hist0->Draw("E");
     TLine * line = new TLine(xmin, 0.07, xmax, 0.07);
     line->SetLineWidth(5);
     line->SetLineStyle(9);
-	pave->SetNDC();
-	pave->Draw();
-	lumi_label->SetNDC();
-	lumi_label->Draw();
-	legend->SetNColumns(2);
-	legend->SetTextSize(0.04);
-	legend->SetTextFont(62);
-	legend->Draw();
+    pave->SetNDC();
+    pave->Draw();
+    lumi_label->SetNDC();
+    lumi_label->Draw();
+    legend->SetNColumns(2);
+    legend->SetTextSize(0.04);
+    legend->SetTextFont(62);
+    legend->Draw();
 
     if(energy.find("30") != std::string::npos) energy = "_030GeV";
     if(energy.find("45") != std::string::npos) energy = "_045GeV";
@@ -758,7 +801,7 @@ void mySystematicsPlotter::plot_Pion2016( TH1F * hist0, std::string energy, std:
     if(energy.find("120") != std::string::npos) energy = "_120GeV";
 
     std::string name = DIRECTORY_NAME+"/systematics_2016_"+region+energy+".pdf";
-	a_0->SaveAs(name.c_str());
+    a_0->SaveAs(name.c_str());
     name = DIRECTORY_NAME+"/systematics_2016_"+region+energy+".C";
     a_0->SaveAs(name.c_str());
     name = DIRECTORY_NAME+"/systematics_2016_"+region+energy+".png";
@@ -774,52 +817,52 @@ void mySystematicsPlotter::plot_Pion2017( TH1F * hist0, std::string energy, std:
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
     if( region.find("EE") != std::string::npos ) xmin = 1.57;
 
-	gStyle->SetPalette(kBird);
-	gStyle->SetOptStat(0);
-	gStyle->SetOptTitle(0);
-	gStyle->SetPaintTextFormat("0.2f");
+    gStyle->SetPalette(kBird);
+    gStyle->SetOptStat(0);
+    gStyle->SetOptTitle(0);
+    gStyle->SetPaintTextFormat("0.2f");
 
-	TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
-	TLatex* lumi_label = new TLatex(0.822, 0.91, "#font[42]{13 TeV}");
-	TCanvas * a_0 = new TCanvas("a0", "", 900, 900);
-	a_0->cd();
-	gPad->SetRightMargin(0.03);
-	gPad->SetLeftMargin(0.125);
-	gPad->SetGridy(1);
-	gPad->SetGridx(1);
-	hist0->SetLineColor(kBlack);
-	hist0->SetLineWidth(3);
-	hist0->SetMarkerStyle(kFullCircle);
-	hist0->SetMarkerColor(kBlack);
-	hist0->SetMarkerSize(3);
-	TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
-	legend->AddEntry(hist0, "Pion Systematics", "lp");
-	legend->AddEntry((TObject*)0, "2017 Conditions", "");
-    std::string temp = "#gamma/e gun: "+energy;
-	legend->AddEntry((TObject*)0, temp.c_str(), "");
-	hist0->SetYTitle("#bf{Systematics [%]}");
-	hist0->SetXTitle("#bf{|#eta|}");
-	hist0->SetAxisRange(xmin, xmax-0.000001 ,"X");
-	hist0->SetAxisRange(yMin, yMax, "Y");
-	hist0->SetLabelSize(0.035, "Y");
-	hist0->SetTitleOffset(1.10, "Y");
-	hist0->SetTitleOffset(0.66, "X");
-	hist0->SetTitleFont(42, "Y");
-	hist0->SetTitleFont(42, "X");
-	hist0->SetTitleSize(0.05, "Y");
-	hist0->SetTitleSize(0.06, "X");
-	hist0->Draw("E");
+    TLatex* pave = new TLatex(0.125, 0.91, "#font[42]{#bf{CMS} Simulation #it{Preliminary}}");
+    TLatex* lumi_label = new TLatex(0.822, 0.91, "#font[42]{13 TeV}");
+    TCanvas * a_0 = new TCanvas("a0", "", 900, 900);
+    a_0->cd();
+    gPad->SetRightMargin(0.03);
+    gPad->SetLeftMargin(0.125);
+    gPad->SetGridy(1);
+    gPad->SetGridx(1);
+    hist0->SetLineColor(kBlack);
+    hist0->SetLineWidth(3);
+    hist0->SetMarkerStyle(kFullCircle);
+    hist0->SetMarkerColor(kBlack);
+    hist0->SetMarkerSize(3);
+    TLegend * legend = new TLegend(0.125,0.7,0.97,0.9);
+    legend->AddEntry(hist0, "Pion Systematics", "lp");
+    legend->AddEntry((TObject*)0, "2017 Conditions", "");
+    std::string temp = "#gamma/e: "+energy;
+    legend->AddEntry((TObject*)0, temp.c_str(), "");
+    hist0->SetYTitle("#bf{Systematics [%]}");
+    hist0->SetXTitle("#bf{|#eta|}");
+    hist0->SetAxisRange(xmin, xmax-0.000001 ,"X");
+    hist0->SetAxisRange(yMin, yMax, "Y");
+    hist0->SetLabelSize(0.035, "Y");
+    hist0->SetTitleOffset(1.10, "Y");
+    hist0->SetTitleOffset(0.66, "X");
+    hist0->SetTitleFont(42, "Y");
+    hist0->SetTitleFont(42, "X");
+    hist0->SetTitleSize(0.05, "Y");
+    hist0->SetTitleSize(0.06, "X");
+    hist0->Draw("E");
     TLine * line = new TLine(xmin, 0.07, xmax, 0.07);
     line->SetLineWidth(5);
     line->SetLineStyle(9);
-	pave->SetNDC();
-	pave->Draw();
-	lumi_label->SetNDC();
-	lumi_label->Draw();
-	legend->SetNColumns(2);
-	legend->SetTextSize(0.04);
-	legend->SetTextFont(62);
-	legend->Draw();
+    pave->SetNDC();
+    pave->Draw();
+    lumi_label->SetNDC();
+    lumi_label->Draw();
+    legend->SetNColumns(2);
+    legend->SetTextSize(0.04);
+    legend->SetTextFont(62);
+    legend->Draw();
 
     if(energy.find("30") != std::string::npos) energy = "_030GeV";
     if(energy.find("45") != std::string::npos) energy = "_045GeV";
@@ -827,7 +870,7 @@ void mySystematicsPlotter::plot_Pion2017( TH1F * hist0, std::string energy, std:
     if(energy.find("120") != std::string::npos) energy = "_120GeV";
 
     std::string name = DIRECTORY_NAME+"/systematics_2017_"+region+energy+".pdf";
-	a_0->SaveAs(name.c_str());
+    a_0->SaveAs(name.c_str());
     name = DIRECTORY_NAME+"/systematics_2017_"+region+energy+".C";
     a_0->SaveAs(name.c_str());
     name = DIRECTORY_NAME+"/systematics_2017_"+region+energy+".png";
@@ -837,4 +880,14 @@ void mySystematicsPlotter::plot_Pion2017( TH1F * hist0, std::string energy, std:
     return;
 };
 
+/*
+   void mySystematicsPlotter::print_yearHistsToFile(TH1F * hist0, TH1F * hist1, TH1F * hist2, TH1F * hist3, TH1F * hist4, std::string year){
+
+   std::string outFileName = "year_systematics_"+year+".dat"
+   ofstream out;
+
+
+   return;
+   }
+   */
 #endif

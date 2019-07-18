@@ -1,4 +1,4 @@
-CFLAGS = -pthread -m64 -lstdc++fs -Wno-deprecated -lboost_program_options
+CFLAGS = -pthread -m64 -Wno-deprecated -lboost_program_options
 CFLAGS += $(shell root-config --cflags --libs)
 HERE = $(shell pwd)
 
