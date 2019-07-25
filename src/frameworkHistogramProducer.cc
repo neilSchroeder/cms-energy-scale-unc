@@ -33,7 +33,8 @@
 #include "../interface/frameworkHistogramProducer.h"
 
 //#define ETA_VETO
-//#define EVENT_INFO
+#define EVENT_INFO
+#define ALT_R9
 
 extern std::string DIRECTORY_NAME; 
 
@@ -44,8 +45,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
     std::cout << "[INFO] Electron File: " << ele_file << "\n[INFO] Photon File: " << pho_file << std::endl;
 
 	//declare some constants
-	int numR9bins = 5;
-	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
+#ifdef ALT_R9
+	int numR9bins = 6;
+	double r9Bins[7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00}; 
+#else 
+    int numR9bins = 5;
+    double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
+#endif
 
 	int numEtaBins = 8;
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
@@ -69,6 +75,11 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 	std::vector< std::vector<TH1F*> > Histogramsg_3;
 	std::vector< std::vector<TH1F*> > Histogramse_4;
 	std::vector< std::vector<TH1F*> > Histogramsg_4;
+#ifdef ALT_R9
+	std::vector< std::vector<TH1F*> > Histogramse_5;
+	std::vector< std::vector<TH1F*> > Histogramsg_5;
+#endif
+
 
 	char titleLow [50];
 	char titleHigh [50];
@@ -84,6 +95,10 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 	std::vector<TH1F*> Histsg_3;
 	std::vector<TH1F*> Histse_4;
 	std::vector<TH1F*> Histsg_4;
+#ifdef ALT_R9
+	std::vector<TH1F*> Histse_5;
+	std::vector<TH1F*> Histsg_5;
+#endif
 
 	int count = 1;
 	int bins = 125600;
@@ -124,6 +139,14 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 			sprintf( tagHigh, "g_4_%i_%i_%i", iii, iii+1, jjj);
 			TH1F * eHist_4 = new TH1F( tagLow, titleLow, bins, 0, 5);
 			TH1F * gHist_4 = new TH1F( tagHigh, titleHigh, bins, 0, 5);
+#ifdef ALT_R9
+			sprintf( titleLow, "e R9_5, %lf < |#eta| < %lf, APD/PN = %lf", etaMin, etaMax, apd);
+			sprintf( titleHigh, "g R9_5, %lf < |#eta| < %lf, APD/PN = %lf", etaMin, etaMax, apd);
+			sprintf( tagLow, "e_5_%i_%i_%i", iii, iii+1, jjj);
+			sprintf( tagHigh, "g_5_%i_%i_%i", iii, iii+1, jjj);
+			TH1F * eHist_5 = new TH1F( tagLow, titleLow, bins, 0, 5);
+			TH1F * gHist_5 = new TH1F( tagHigh, titleHigh, bins, 0, 5);
+#endif
 			Histse_0.push_back(eHist_0);
 			Histsg_0.push_back(gHist_0);
             Histse_1.push_back(eHist_1);
@@ -134,6 +157,11 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             Histsg_3.push_back(gHist_3);
             Histse_4.push_back(eHist_4);
             Histsg_4.push_back(gHist_4);
+#ifdef ALT_R9
+            Histse_5.push_back(eHist_5);
+            Histsg_5.push_back(gHist_5);
+#endif
+
 			if(iii != 4) count++;
 		}//end for jjj
 		Histogramse_0.push_back(Histse_0);
@@ -146,6 +174,10 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 		Histogramsg_3.push_back(Histsg_3);
 		Histogramse_4.push_back(Histse_4);
 		Histogramsg_4.push_back(Histsg_4);
+#ifdef ALT_R9
+		Histogramse_5.push_back(Histse_5);
+		Histogramsg_5.push_back(Histsg_5);
+#endif
 		Histse_0.clear();
 		Histsg_0.clear();
         Histse_1.clear();
@@ -156,6 +188,10 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
         Histsg_3.clear();
         Histse_4.clear();
         Histsg_4.clear();
+#ifdef ALT_R9
+        Histse_5.clear();
+        Histsg_5.clear();
+#endif
 	}//end for iii
 
 	//tree members
@@ -257,32 +293,39 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                 if(fabs(etaSC[0]) > 1.128 && fabs(etaSC[0]) < 1.152) noVeto = false;
 #endif
                                 if(noVeto){
-                                //make 2D plots for R9 bins:::
-                                if(full5x5_R9[0] > r9Bins[0] && full5x5_R9[0] < r9Bins[1]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_0[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[0] > r9Bins[1] && full5x5_R9[0] < r9Bins[2]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_1[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[0] > r9Bins[2] && full5x5_R9[0] < r9Bins[3]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_2[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[0] > r9Bins[3] && full5x5_R9[0] < r9Bins[4]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_3[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[0] > r9Bins[4] && full5x5_R9[0] < r9Bins[5]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_4[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
-                                    }//end for apd bins
-                                }
+                                    //make 2D plots for R9 bins:::
+                                    if(full5x5_R9[0] > r9Bins[0] && full5x5_R9[0] < r9Bins[1]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_0[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[0] > r9Bins[1] && full5x5_R9[0] < r9Bins[2]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_1[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[0] > r9Bins[2] && full5x5_R9[0] < r9Bins[3]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_2[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[0] > r9Bins[3] && full5x5_R9[0] < r9Bins[4]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_3[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[0] > r9Bins[4] && full5x5_R9[0] < r9Bins[5]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_4[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+#ifdef ALT_R9
+                                    if(full5x5_R9[0] > r9Bins[5] && full5x5_R9[0] < r9Bins[6]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_5[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+#endif
                                 }
 #ifdef ETA_VETO
                                 noVeto = true;
@@ -317,6 +360,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                         Histogramse_4[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
                                     }//end for apd bins
                                 }
+#ifdef ALT_R9
+                                if(full5x5_R9[1] > r9Bins[5] && full5x5_R9[1] < r9Bins[6]){
+                                    for(int i = 0; i < 100; i++){
+                                        Histogramse_5[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                    }//end for apd bins
+                                }
+#endif
                                 }
                             }
                         }//end if both particles are reconstructed
@@ -422,6 +472,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                             Histogramsg_4[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
                                         }//end for apd bins
                                     }
+#ifdef ALT_R9
+                                    if(full5x5_R9[0] > r9Bins[5] && full5x5_R9[0] < r9Bins[6]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_5[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                        }//end for apd bins
+                                    }
+#endif
                                 }//end if veto
 #ifdef ETA_VETO
                                 noVeto = true;
@@ -456,6 +513,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                             Histogramsg_4[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
                                         }//end for apd bins
                                     }
+#ifdef ALT_R9
+                                    if(full5x5_R9[1] > r9Bins[5] && full5x5_R9[1] < r9Bins[6]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_5[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
+#endif
                                 }
                             }//end if the particles are inside 2.5
                         }//end if both particles are reconstructed
@@ -508,6 +572,11 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             Histogramsg_2[i][j]->Write();
             Histogramsg_3[i][j]->Write();
             Histogramsg_4[i][j]->Write();
+#ifdef ALT_R9
+            Histogramse_5[i][j]->Write();
+            Histogramsg_5[i][j]->Write();
+#endif
+
 #ifdef EVENT_INFO            
             if(j == 0){
 
@@ -544,6 +613,10 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             delete Histogramsg_2[i][j];
             delete Histogramsg_3[i][j];
             delete Histogramsg_4[i][j];
+#ifdef ALT_R9
+            delete Histogramse_5[i][j];
+            delete Histogramsg_5[i][j];
+#endif
         }
     }
     std::cout << "[STATUS] finished writing to file... " << std::endl;

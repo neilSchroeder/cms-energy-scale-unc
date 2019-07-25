@@ -34,6 +34,10 @@
 std::string DIRECTORY_NAME = "fnuf_systematics";
 std::string info = "[INFO] ";
 std::string error = "[ERROR] ";
+
+bool _flag_crossChecks = false;
+bool _flag_truncate = false;
+
 int main( int argc, char **argv ){
     using namespace boost;
     namespace opts = boost::program_options;
@@ -55,7 +59,10 @@ int main( int argc, char **argv ){
         ("outDir", opts::value<std::string>(&DIRECTORY_NAME), "Output Directory (default is 'fnuf_systematics')")
         ("boostedSystematics", opts::bool_switch(&boostedSystematics), "Boost systematics to cover method uncertainties (enabled by default)")
         ("usingPions", opts::bool_switch(&usingPions), "If you are using pions instead of photons for this production, enable this option (disabled by default)")        
-        ("force", opts::bool_switch(&force), "If you want to reproduce your root file, turn this option on (disabled by default)");        
+        ("crossCheck", opts::bool_switch(&_flag_crossChecks), "Produce crossCheck plots")
+        ("trunc", opts::bool_switch(&_flag_truncate), "Activating this option will truncate plots before obtaining the mean")
+        ("ratio", opts::bool_switch(&_flag_ratio), "DEVELOPER OPTION, USE WITH CAUTION")
+        ("force", opts::bool_switch(&force), "If you want to reproduce your root file, turn this option on (disabled by default)")        
     ;
 
 
@@ -96,27 +103,41 @@ int main( int argc, char **argv ){
         }
     }
 
-    
+    /////////////////////
+    // declare classes //
+    /////////////////////
+
     myHistogramProducer hist_producer;
     myLookUpTableProducer table_producer;
     mySystematicsPlotter syst_plotter;
+
+    if(_flag_ratio){
+        std::cout << info << "[OPTION --ratio] was provided" << std::endl;
+        std::cout << info << "producing ratio systematics using " << std::endl;
+        std::cout << info << "[OPTION --eleInputFile] " << eleInputFile << std::endl;
+        std::cout << info << "[OPTION --phoInputFile] " << phoInputFile << std::endl;
+        std::cout << info << "[OPTION --eleInputFile2] " << eleInputFile2 << std::endl;
+        std::cout << info << "[OPTION --phoInputFile2] " << phoInputFile2 << std::endl;
+
+        std::string file1 = utility.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+        std::string file2 = utility.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut2, DIRECTORY_NAME);
+        utility.produce_Ratio_Plots(file1, file2);
+        return 0;
+    }
 
     if( usingPions ) std::cout << info << "You are using pions" << std::endl;
 
     if( usingPions ) hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
     else{
         std::string temp_filename = DIRECTORY_NAME+rootFileOut+".root";
-        std::cout << info << "looking for a root file called: " << temp_filename << std::endl;
-        std::cout << "[INPUT REQUIRED] is this the correct file (y/n) (default is yes)?" << std::endl;
-        std::string input = "";
-        std::cin >> input;
-        if(input.compare("n") == 0){
-            std::cout << error << "the user has indicated the file name is incorrect" << std::endl;
-            return 1;
-        }
+        std::cout << info << "Looking for a root file called: " << temp_filename << std::endl;
+        if(force) hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
         else{
-            TFile * file_exists = TFile::Open(temp_filename.c_str(),"READ");
-            if(!file_exists || force) hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+            if( !TFile::Open(temp_filename.c_str(),"READ")) hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+            else{
+            std::cout << info << "[OPTION --force] not provided \n[INFO] found file: " << temp_filename << std::endl;
+            std::cout << info << "Continuing without reproducing root file... " << std::endl;
+            }
         }
     }
 
@@ -131,6 +152,20 @@ int main( int argc, char **argv ){
         table_producer.produce_LookUpTables(rootFileOut, boostedSystematics);
         syst_plotter.produce_2016_2017_Plots(rootFileOut, boostedSystematics);
     }
+
+    /////////////////////////////////////////
+    // turn the .dat files into tex tables //
+    /////////////////////////////////////////
+
+    std::string energy;
+    if(eleInputFile.find("30") != std::string::npos) energy = "30GeV";
+    if(eleInputFile.find("45") != std::string::npos) energy = "45GeV";
+    if(eleInputFile.find("60") != std::string::npos) energy = "60GeV";
+    if(eleInputFile.find("120") != std::string::npos) energy = "120GeV";
+
+    system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2016_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2016_"+energy+"'").c_str()); 
+    system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2017_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2017_"+energy+"'").c_str()); 
+    system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2018_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2018_"+energy+"'").c_str()); 
 
     return 0;
 }
