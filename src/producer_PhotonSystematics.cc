@@ -37,6 +37,8 @@ std::string error = "[ERROR] ";
 
 bool _flag_crossChecks = false;
 bool _flag_truncate = false;
+bool _flag_tex = true;
+bool _flag_ratio = false;
 
 int main( int argc, char **argv ){
     using namespace boost;
@@ -44,7 +46,10 @@ int main( int argc, char **argv ){
 
     std::string eleInputFile;
     std::string phoInputFile;
+    std::string eleInputFile2;
+    std::string phoInputFile2;
     std::string rootFileOut = "fnuf_systematics_out";
+    std::string rootFileOut2 = "fnuf_systematics_out2";
     bool        boostedSystematics = 1;
     bool        usingPions = 0;
     bool        force = 0;
@@ -53,15 +58,19 @@ int main( int argc, char **argv ){
     
     desc.add_options()
         ("help", "print help message")
-        ("eleInputFile", opts::value<std::string>(&eleInputFile), "Electron Input File")
-        ("phoInputFile", opts::value<std::string>(&phoInputFile), "Photon Input File")
-        ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output Root File Name (default is 'fnuf_systematics_out')")
+        ("eleInputFile", opts::value<std::string>(&eleInputFile), "Electron input file")
+        ("phoInputFile", opts::value<std::string>(&phoInputFile), "Photon input file")
+        ("eleInputFile2", opts::value<std::string>(&eleInputFile2), "Second electron input file (to be used with --ratio)")
+        ("phoInputFile2", opts::value<std::string>(&phoInputFile2), "Second photon input file (to be used with --ratio)"
+        ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output root file name (default is 'fnuf_systematics_out')")
+        ("rootFileOut2", opts::value<std::string>(&rootFileOut2), "Second output root file name (default is 'fnuf_systematics_out2')")
         ("outDir", opts::value<std::string>(&DIRECTORY_NAME), "Output Directory (default is 'fnuf_systematics')")
-        ("boostedSystematics", opts::bool_switch(&boostedSystematics), "Boost systematics to cover method uncertainties (enabled by default)")
+        ("boost", opts::bool_switch(&boostedSystematics), "Boost systematics to cover method uncertainties (enabled by default)")
+        ("tex", opts::bool_switch(&_flag_tex), "Use this option to turn off producing .tex tables")
         ("usingPions", opts::bool_switch(&usingPions), "If you are using pions instead of photons for this production, enable this option (disabled by default)")        
         ("crossCheck", opts::bool_switch(&_flag_crossChecks), "Produce crossCheck plots")
         ("trunc", opts::bool_switch(&_flag_truncate), "Activating this option will truncate plots before obtaining the mean")
-        ("ratio", opts::bool_switch(&_flag_ratio), "DEVELOPER OPTION, USE WITH CAUTION")
+        ("ratio", opts::bool_switch(&_flag_ratio), "DEVELOPER OPTION, USE WITH CAUTION \nwill produce the ratio files used for the corrections")
         ("force", opts::bool_switch(&force), "If you want to reproduce your root file, turn this option on (disabled by default)")        
     ;
 
@@ -103,6 +112,30 @@ int main( int argc, char **argv ){
         }
     }
 
+    if(!v_map.count("eleInputFile2")){
+        std::cout << error << "you MUST provide an input file using eleInputFile2" << std::endl;
+        return 1;
+    }
+    else{
+        std::ifstream in(eleInputFile2.c_str());
+        if(in.peek() == std::ifstream::traits_type::eof()){
+            std::cout << error << "eleInputFile2: " << eleInputFile2 << " is empty or does not exist" << std::endl;
+            return 1;
+        }
+    }
+
+    if(!v_map.count("phoInputFile2")){
+        std::cout << error << "you MUST provide an input file using phoInputFile2" << std::endl;
+        return 1;
+    }
+    else{
+        std::ifstream in(phoInputFile2.c_str());
+        if(in.peek() == std::ifstream::traits_type::eof()){
+            std::cout << error << "phoInputFile2: " << phoInputFile2 << " is empty or does not exist" << std::endl;
+            return 1;
+        }
+    }
+
     /////////////////////
     // declare classes //
     /////////////////////
@@ -119,15 +152,22 @@ int main( int argc, char **argv ){
         std::cout << info << "[OPTION --eleInputFile2] " << eleInputFile2 << std::endl;
         std::cout << info << "[OPTION --phoInputFile2] " << phoInputFile2 << std::endl;
 
-        std::string file1 = utility.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
-        std::string file2 = utility.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut2, DIRECTORY_NAME);
-        utility.produce_Ratio_Plots(file1, file2);
+        hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+        hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut2, DIRECTORY_NAME);
+
+        rootFileOut = DIRECTORY_NAME+rootFileOut;
+        rootFileOut2 = DIRECTORY_NAME+rootFileOut2;
+        if(rootFileOut.find(".root") == std::string::npos) rootFileOut = rootFileOut+".root";
+        if(rootFileOut2.find(".root") == std::string::npos) rootFileOut2 = rootFileOut2+".root";
+
+        table_producer.produce_Ratio_Plots(rootFileOut, rootFileOut2);
         return 0;
     }
 
-    if( usingPions ) std::cout << info << "You are using pions" << std::endl;
-
-    if( usingPions ) hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+    if( usingPions ){
+        std::cout << info << "You are using pions" << std::endl;
+        hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
+    }
     else{
         std::string temp_filename = DIRECTORY_NAME+rootFileOut+".root";
         std::cout << info << "Looking for a root file called: " << temp_filename << std::endl;
@@ -144,6 +184,7 @@ int main( int argc, char **argv ){
     rootFileOut = DIRECTORY_NAME+rootFileOut;
     if(rootFileOut.find(".root") == std::string::npos) rootFileOut = rootFileOut+".root";
 
+
     if( usingPions ){
         table_producer.produce_PionLookUpTables(rootFileOut, boostedSystematics);
         syst_plotter.produce_2016_2017_PionPlots(rootFileOut, boostedSystematics);
@@ -153,19 +194,22 @@ int main( int argc, char **argv ){
         syst_plotter.produce_2016_2017_Plots(rootFileOut, boostedSystematics);
     }
 
+    if(_flag_tex){
+
     /////////////////////////////////////////
     // turn the .dat files into tex tables //
     /////////////////////////////////////////
 
-    std::string energy;
-    if(eleInputFile.find("30") != std::string::npos) energy = "30GeV";
-    if(eleInputFile.find("45") != std::string::npos) energy = "45GeV";
-    if(eleInputFile.find("60") != std::string::npos) energy = "60GeV";
-    if(eleInputFile.find("120") != std::string::npos) energy = "120GeV";
+        std::string energy;
+        if(eleInputFile.find("30") != std::string::npos) energy = "30GeV";
+        if(eleInputFile.find("45") != std::string::npos) energy = "45GeV";
+        if(eleInputFile.find("60") != std::string::npos) energy = "60GeV";
+        if(eleInputFile.find("120") != std::string::npos) energy = "120GeV";
 
-    system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2016_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2016_"+energy+"'").c_str()); 
-    system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2017_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2017_"+energy+"'").c_str()); 
-    system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2018_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2018_"+energy+"'").c_str()); 
+        system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2016_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2016_"+energy+"'").c_str()); 
+        system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2017_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2017_"+energy+"'").c_str()); 
+        system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2018_"+energy+"' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2018_"+energy+"'").c_str()); 
+    }
 
     return 0;
 }
