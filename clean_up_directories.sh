@@ -7,7 +7,7 @@ if [ -d "$DIRECTORY" ]; then
     rm *.pdf
     rm *.C
     rm *.png
-    if [ -d "tex" ]; then 
+    if [ ! -d "tex" ]; then 
         mkdir tex
     fi
     cd ..

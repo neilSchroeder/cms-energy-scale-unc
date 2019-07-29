@@ -33,8 +33,8 @@
 #include "../interface/frameworkHistogramProducer.h"
 
 //#define ETA_VETO
-#define EVENT_INFO
-#define ALT_R9
+//#define EVENT_INFO
+//#define ALT_R9
 
 extern std::string DIRECTORY_NAME; 
 
@@ -622,6 +622,7 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
     std::cout << "[STATUS] finished writing to file... " << std::endl;
 	return;
 };
+
 
 void myHistogramProducer::produce_PION_Histograms( std::string ele_file, std::string pi_file, std::string outputFileName, std::string outputDirectoryName){
     std::string ret = "";
