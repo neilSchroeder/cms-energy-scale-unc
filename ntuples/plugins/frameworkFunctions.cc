@@ -95,13 +95,13 @@ void framework::initializeGlobals(){
     int id, ix, iy, ieta, iphi, iz;
     float eta;
     ifstream in;
-    in.open("/home/schr1077/CMSSW_Sim/CMSSW_8_0_26_patch1/src/analyzer/ntuples/plugins/data/ecal_barrel_eta.dat");
+    in.open("/home/schr1077/cms/fnuf_framework/CMSSW_8_0_26_patch1/src/lceFramework/ntuples/plugins/data/ecal_barrel_eta.dat");
     if(!in.good()) cout << "your file didn't open" << endl;
     while(in >> id >> ieta >> iphi >> iz >> eta){
         ecal_map_barrel.insert( std::pair< typename std::pair<int, int>, float>(std::pair<int, int>(ieta, iphi), eta));
     }
     in.close();
-    in.open("/home/schr1077/CMSSW_Sim/CMSSW_8_0_26_patch1/src/analyzer/ntuples/plugins/data/ecal_endcap_eta.dat");
+    in.open("/home/schr1077/cms/fnuf_framework/CMSSW_8_0_26_patch1/src/lceFramework/ntuples/plugins/data/ecal_endcap_eta.dat");
     while(in >> id >> ix >> iy >> iz >> eta){
         ecal_map_endcap.insert( std::pair<typename std::tuple<int, int, int>, float>(std::tuple<int, int, int>(ix, iy, iz), eta));
     }
@@ -165,6 +165,7 @@ void framework::correctedEnergy( reco::Photon e, edm::SortedCollection<EcalRecHi
 
 						//Get the Depth of the PCaloHit and its corresponding bin
 						depthHere = (double)((caloHitsItr->depth())>>2)/NUM_XTAL_BINS; //16383 is 2^14 - 1
+                        std::cout << caloHitsItr->depth() << " " << (caloHitsItr->depth()>>2) << " " << NUM_XTAL_BINS << " " << depthHere << std::endl;
 						//sum up the weighted energy using functions
 						if( depthHere == 0.) depthHere = 1./(NUM_XTAL_BINS);
 						if( depthHere == 1.) depthHere = 1 - 1./(NUM_XTAL_BINS);

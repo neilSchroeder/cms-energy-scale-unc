@@ -31,9 +31,22 @@
 #include <fstream>
 #include "boost/program_options.hpp"
 
+//#define ALT_R9
+
 std::string DIRECTORY_NAME = "fnuf_systematics";
 std::string info = "[INFO] ";
 std::string error = "[ERROR] ";
+
+#ifndef ALT_R9
+	int numR9bins = 5;
+	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
+#else
+    int numR9bins = 6;
+    double r9Bins [7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00};
+#endif
+
+	int numEtaBins = 8;
+	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
 
 bool _flag_crossChecks = false;
 bool _flag_truncate = false;

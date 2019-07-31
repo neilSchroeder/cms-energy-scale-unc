@@ -224,6 +224,7 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 	bool noVeto = true;
 	// by my own convention this loop will be the electron loop
     while( in >> rootFile){
+        if(TFile::Open(rootFile.c_str(), "READ")){
         TFile * myFile = TFile::Open(rootFile.c_str());
         if(!(myFile->IsZombie())){
             TIter next(myFile->GetListOfKeys());
@@ -383,6 +384,11 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
         }
         myFile->Close();
+        }//end if file opens
+        else{
+            std::cout << "[ERROR] the file " << rootFile << " did not open or does not exist" << std::endl;
+            std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
+        }
     }//end while files in
 	
 	in.close();
@@ -390,6 +396,7 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 
 	// this loop will be the photon loop
     while( in >> rootFile){
+        if(TFile::Open(rootFile.c_str(), "READ")){
         TFile * myFile = TFile::Open(rootFile.c_str());
         if(!(myFile->IsZombie())){
             TIter next(myFile->GetListOfKeys());
@@ -475,7 +482,7 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 #ifdef ALT_R9
                                     if(full5x5_R9[0] > r9Bins[5] && full5x5_R9[0] < r9Bins[6]){
                                         for(int i = 0; i < 100; i++){
-                                            Histogramse_5[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
+                                            Histogramsg_5[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
                                         }//end for apd bins
                                     }
 #endif
@@ -516,7 +523,7 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 #ifdef ALT_R9
                                     if(full5x5_R9[1] > r9Bins[5] && full5x5_R9[1] < r9Bins[6]){
                                         for(int i = 0; i < 100; i++){
-                                            Histogramse_5[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                            Histogramsg_5[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
                                         }//end for apd bins
                                     }
 #endif
@@ -536,6 +543,11 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
         }
         myFile->Close();
+        }
+        else{
+            std::cout << "[ERROR] The file " << pho_file << " did not open or does not exist" << std::endl;
+            std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
+        }
     }//end while files in
 	
 	in.close();
@@ -573,6 +585,9 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
             Histogramsg_3[i][j]->Write();
             Histogramsg_4[i][j]->Write();
 #ifdef ALT_R9
+            if(!Histogramse_5[i][j] || !Histogramsg_5[i][j]){
+                std::cout << "YOU DONE GOOFED" << i << " " << j<< std::endl;
+            }
             Histogramse_5[i][j]->Write();
             Histogramsg_5[i][j]->Write();
 #endif

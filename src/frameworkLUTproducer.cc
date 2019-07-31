@@ -36,24 +36,23 @@
 //#define check
 
 extern std::string DIRECTORY_NAME;
-
-
 /// Produce FNUF Histograms only analyzes two files at a time
 
 void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corrections){
 
     std::cout << "[STATUS] begin producing look-up tables... " << std::endl;
-
 #ifdef ALT_R9
 	int numR9bins = 6;
 	double r9Bins[7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00}; 
-#else
-	int numR9bins = 5;
-	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
+#else 
+    int numR9bins = 5;
+    double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
 	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
+	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+
+
 	TFile* myHistograms = new TFile(fileName.c_str(), "READ");
 
     std::cout << "[STATUS] initializing histograms ... " << std::endl;
@@ -122,10 +121,10 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 			sprintf( title, "g_4_%i_%i_%i", i, i+1, j);
 			g_4.push_back((TH1F*)myHistograms->Get(title));
 #ifdef ALT_R9
-			sprintf( title, "e_4_%i_%i_%i", i, i+1, j);
-			e_4.push_back((TH1F*)myHistograms->Get(title));
-			sprintf( title, "g_4_%i_%i_%i", i, i+1, j);
-			g_4.push_back((TH1F*)myHistograms->Get(title));
+			sprintf( title, "e_5_%i_%i_%i", i, i+1, j);
+			e_5.push_back((TH1F*)myHistograms->Get(title));
+			sprintf( title, "g_5_%i_%i_%i", i, i+1, j);
+			g_5.push_back((TH1F*)myHistograms->Get(title));
 #endif
       	}
 		e_0_hists.push_back(e_0);
@@ -160,9 +159,9 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 
     std::cout << "[INFO] evaluating systematics ... " << std::endl;
 #ifndef ALT_R9
-    std::string uncertainty_low = "rootFiles/uncertainty_hists_low.root";
-    std::string uncertainty_high = "rootFiles/uncertainty_hists_high.root";
-    std::string uncertainty_frontDown = "rootFiles/uncertainty_hists_frontDown.root";
+    std::string uncertainty_low = "rootFiles/uncertainty_hists_low_060.root";
+    std::string uncertainty_high = "rootFiles/uncertainty_hists_high_060.root";
+    std::string uncertainty_frontDown = "rootFiles/uncertainty_hists_frontDown_060.root";
 
 
     if(fileName.find("030") != std::string::npos){
@@ -225,11 +224,16 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
     TH2F * front_ratio_3 = (TH2F*)correction_front->Get("ratio_3");
     TH2F * front_ratio_4 = (TH2F*)correction_front->Get("ratio_4");
 
+
 #ifdef ALT_R9
     TH2F * low_ratio_5 = (TH2F*)correction_low->Get("ratio_5");
     TH2F * high_ratio_5 = (TH2F*)correction_high->Get("ratio_5");
     TH2F * front_ratio_5 = (TH2F*)correction_front->Get("ratio_5");
 #endif
+
+    std::cout<< low_ratio_4->GetEntries() << std::endl;
+    std::cout<< high_ratio_4->GetEntries() << std::endl;
+    std::cout<< front_ratio_4->GetEntries() << std::endl;
 
 	double mean1, mean2;
 	double err1, err2;
@@ -329,6 +333,16 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 };
 
 void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title, double xMin, double xMax, double zMin, double zMax){
+#ifdef ALT_R9
+	int numR9bins = 6;
+	double r9Bins[7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00}; 
+#else 
+    int numR9bins = 5;
+    double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
+#endif
+
+	int numEtaBins = 8;
+	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
     TCanvas * a = new TCanvas("a", "", 900, 900);
     if( !(thisHist) ) std::cout << "[ERROR] could not open historgram: " << thisHist->GetName() << std::endl;
     a->cd();
@@ -371,18 +385,18 @@ void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title,
 };
 
 void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std::string fileName2){
-
-    std::cout << "begin producing ratio look-up tables... " << std::endl;
-
-	int numR9bins = 5;
-	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
 #ifdef ALT_R9
-    numR9bins = 6;
-    r9Bins [7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00};
+	int numR9bins = 6;
+	double r9Bins[7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00}; 
+#else 
+    int numR9bins = 5;
+    double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
 	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
+	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+
+    std::cout << "begin producing ratio look-up tables... " << std::endl;
 
     std::cout << "initializing histograms ... " << std::endl;
 
@@ -394,7 +408,7 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
     std::vector< TH1F* > temp3_;
     char title [50];
     for(int i = 0; i < 100; i++){
-        for(int j = 0; j < numEtaBins; j++){
+        for(int j = 0; j < numR9bins; j++){
             sprintf(title, "ratio_%i_%i", i, j);
             temp3_.push_back(new TH1F(title, title, numEtaBins, etaBins));
             sprintf(title, "systematics1_%i_%i", i, j);
@@ -429,7 +443,7 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
     TH2F * ratio_4 = new TH2F("ratio_4", "", numEtaBins, etaBins, 100, 0.005, 1.005);
 #ifdef ALT_R9
 	TH2F * mean1_5 = new TH2F("mean1_5", "", numEtaBins, etaBins, 100, 0.005, 1.005);
-	TH2F * mean1_5 = new TH2F("mean1_5", "", numEtaBins, etaBins, 100, 0.005, 1.005);
+	TH2F * mean2_5 = new TH2F("mean2_5", "", numEtaBins, etaBins, 100, 0.005, 1.005);
 	TH2F * ratio_5 = new TH2F("ratio_5", "", numEtaBins, etaBins, 100, 0.005, 1.005);
 #endif
 
@@ -682,6 +696,12 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
                 mean12 = g1_4_hists[eta][99-apd]->GetMean();
                 mean1_4->SetBinContent(eta + 1, apd + 1, ((mean12/mean11) ));
                 systematics1[apd][4]->SetBinContent(eta+1, mean12/mean11);
+#ifdef ALT_R9
+                mean11 = e1_5_hists[eta][99-apd]->GetMean();
+                mean12 = g1_5_hists[eta][99-apd]->GetMean();
+                mean1_5->SetBinContent(eta + 1, apd + 1, ((mean12/mean11) ));
+                systematics1[apd][5]->SetBinContent(eta+1, mean12/mean11);
+#endif
 
                 mean21 = e2_0_hists[eta][99-apd]->GetMean();
                 mean22 = g2_0_hists[eta][99-apd]->GetMean();
@@ -707,6 +727,12 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
                 mean22 = g2_4_hists[eta][99-apd]->GetMean();
                 mean2_4->SetBinContent(eta + 1, apd + 1, ((mean22/mean21) ));
                 systematics2[apd][4]->SetBinContent(eta+1, mean22/mean21);
+#ifdef ALT_R9
+                mean21 = e2_5_hists[eta][99-apd]->GetMean();
+                mean22 = g2_5_hists[eta][99-apd]->GetMean();
+                mean2_5->SetBinContent(eta + 1, apd + 1, ((mean22/mean21) ));
+                systematics2[apd][5]->SetBinContent(eta+1, mean22/mean21);
+#endif
 
 
                 ratio[apd][0]->SetBinContent(eta+1, 100*((systematics1[apd][0]->GetBinContent(eta+1)/systematics2[apd][0]->GetBinContent(eta+1))- 1));
@@ -802,7 +828,7 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
     myLookUpTableProducer::plot_LookUpTable(ratio_EE_3,"ratioLookUpTable_EE_R9_3", 1.566, 2.499, -15, 15);
     myLookUpTableProducer::plot_LookUpTable(ratio_EE_4,"ratioLookUpTable_EE_R9_4", 1.566, 2.499, -15, 15);
 #ifdef ALT_R9
-    myLookUpTableProducer::plot_LookUpTable(ratiro_EE_5,"ratioLookUpTable_EE_R9_5", 1.566, 2.499, -15, 15);
+    myLookUpTableProducer::plot_LookUpTable(ratio_EE_5,"ratioLookUpTable_EE_R9_5", 1.566, 2.499, -15, 15);
 #endif
 
     std::cout << std::endl << "[INFO] ratio look-up tables have been produced ... " << std::endl;
@@ -812,18 +838,19 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
 };
 
 void myLookUpTableProducer::produce_PionLookUpTables(std::string fileName, bool corrections){
-
-    std::cout << "[STATUS] begin producing look-up tables... " << std::endl;
-
-	int numR9bins = 5;
-	double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00}; 
 #ifdef ALT_R9
-    numR9bins = 6;
-    r9Bins [6] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00};
+	int numR9bins = 6;
+	double r9Bins[7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00}; 
+#else 
+    int numR9bins = 5;
+    double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
 	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.566, 1.8, 2.1, 2.5};
+	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+
+    std::cout << "[STATUS] begin producing look-up tables... " << std::endl;
+
 	TFile* myHistograms = new TFile(fileName.c_str(), "READ");
 
     std::cout << "[STATUS] initializing histograms ... " << std::endl;
