@@ -165,7 +165,6 @@ void framework::correctedEnergy( reco::Photon e, edm::SortedCollection<EcalRecHi
 
 						//Get the Depth of the PCaloHit and its corresponding bin
 						depthHere = (double)((caloHitsItr->depth())>>2)/NUM_XTAL_BINS; //16383 is 2^14 - 1
-                        std::cout << caloHitsItr->depth() << " " << (caloHitsItr->depth()>>2) << " " << NUM_XTAL_BINS << " " << depthHere << std::endl;
 						//sum up the weighted energy using functions
 						if( depthHere == 0.) depthHere = 1./(NUM_XTAL_BINS);
 						if( depthHere == 1.) depthHere = 1 - 1./(NUM_XTAL_BINS);

@@ -179,6 +179,7 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
         uncertainty_high = "rootFiles/uncertainty_hists_high_120.root";
         uncertainty_frontDown = "rootFiles/uncertainty_hists_frontDown_120.root";
     }
+
 #else
     std::string uncertainty_low = "rootFiles/uncertainty_hists_low_060_altR9.root";
     std::string uncertainty_high = "rootFiles/uncertainty_hists_high_060_altR9.root";
@@ -255,26 +256,32 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
                 mean2 = g_0_hists[eta][99-apd]->GetMean();
                 if(corrections) mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_0);
                 else mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                std::cout << mean1 << " " << mean2 << std::endl;
 
                 mean1 = e_1_hists[eta][99-apd]->GetMean();
                 mean2 = g_1_hists[eta][99-apd]->GetMean();
                 if(corrections) mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_1);
                 else mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                std::cout << mean1 << " " << mean2 << std::endl;
 
                 mean1 = e_2_hists[eta][99-apd]->GetMean();
                 mean2 = g_2_hists[eta][99-apd]->GetMean();
                 if(corrections) mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_2);
                 else mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                std::cout << mean1 << " " << mean2 << std::endl;
 
                 mean1 = e_3_hists[eta][99-apd]->GetMean();
                 mean2 = g_3_hists[eta][99-apd]->GetMean();
                 if(corrections) mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_3);
                 else mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                std::cout << mean1 << " " << mean2 << std::endl;
 
                 mean1 = e_4_hists[eta][99-apd]->GetMean();
                 mean2 = g_4_hists[eta][99-apd]->GetMean();
                 if(corrections) mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_4);
                 else mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+
+                std::cout << mean1 << " " << mean2 << std::endl << std::endl;
 #ifdef ALT_R9
                 mean1 = e_5_hists[eta][99-apd]->GetMean();
                 mean2 = g_5_hists[eta][99-apd]->GetMean();
@@ -309,22 +316,13 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 #endif
 
 
-    myLookUpTableProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 1.44419, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_1, "lookUpTable_EB_R9_1", 0., 1.44419, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_2, "lookUpTable_EB_R9_2", 0., 1.44419, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_3, "lookUpTable_EB_R9_3", 0., 1.44419, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_4, "lookUpTable_EB_R9_4", 0., 1.44419, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 2.49999, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_1, "lookUpTable_EB_R9_1", 0., 2.49999, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_2, "lookUpTable_EB_R9_2", 0., 2.49999, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_3, "lookUpTable_EB_R9_3", 0., 2.49999, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_4, "lookUpTable_EB_R9_4", 0., 2.49999, -0.7, 0.7);
 #ifdef ALT_R9
-    myLookUpTableProducer::plot_LookUpTable( mean_5, "lookUpTable_EB_R9_4", 0., 1.44419, -0.7, 0.7);
-#endif
-
-    myLookUpTableProducer::plot_LookUpTable( mean_EE_0, "lookUpTable_EE_R9_0", 1.566, 2.499, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_EE_1, "lookUpTable_EE_R9_1", 1.566, 2.499, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_EE_2, "lookUpTable_EE_R9_2", 1.566, 2.499, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_EE_3, "lookUpTable_EE_R9_3", 1.566, 2.499, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_EE_4, "lookUpTable_EE_R9_4", 1.566, 2.499, -0.7, 0.7);
-#ifdef ALT_R9
-    myLookUpTableProducer::plot_LookUpTable( mean_EE_5, "lookUpTable_EE_R9_5", 1.566, 2.499, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_5, "lookUpTable_EB_R9_4", 0., 2.49999, -0.7, 0.7);
 #endif
 
     std::cout << std::endl << "[INFO] look-up tables have been produced ... " << std::endl;
@@ -341,9 +339,10 @@ void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title,
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
+
 	int numEtaBins = 8;
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
-    TCanvas * a = new TCanvas("a", "", 900, 900);
+    TCanvas * a = new TCanvas("a", "", 1600, 1200);
     if( !(thisHist) ) std::cout << "[ERROR] could not open historgram: " << thisHist->GetName() << std::endl;
     a->cd();
     gStyle->SetPalette(kBird);
@@ -352,24 +351,29 @@ void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title,
     gStyle->SetOptTitle(0);
 
     TLatex* pave = new TLatex(0.100, 0.91, "#font[42]{#bf{CMS} #it{Simulation Preliminary}}");
-    TLatex* lumi_label = new TLatex(0.75, 0.91, "#font[42]{13 TeV}");
+    TLatex* lumi_label = new TLatex(0.9, 0.91, "#font[42]{13 TeV}");
+    lumi_label->SetTextAlign(31);
     thisHist->SetXTitle("|#eta|");
     thisHist->SetYTitle("Laser Response");
     thisHist->SetZTitle("Systematics [%]");
     thisHist->Draw("colztext");
     thisHist->SetContour(99);
     thisHist->SetAxisRange(xMin, xMax, "X");
-    if(title.find("EB") != std::string::npos) thisHist->SetAxisRange(0.8, 0.9999999, "Y");
-    if(title.find("EE") != std::string::npos) thisHist->SetAxisRange(0.4, 0.8999999, "Y");
+    thisHist->SetAxisRange(0.5, 1., "Y");
     thisHist->SetAxisRange(zMin, zMax, "Z");
     thisHist->SetLabelSize(0.03, "Y");
     thisHist->SetLabelSize(0.02, "Z");
     thisHist->SetTitleSize(0.03, "Z");
     thisHist->SetTitleOffset(1.25, "Y");
+    TBox * myBox = new TBox(1.4442, 0.5, 1.57, 1.);
+    myBox->SetFillStyle(3002);
+    myBox->SetFillColor(kBlack);
+    myBox->SetLineColor(kBlack);
     pave->SetNDC();
     pave->Draw();
     lumi_label->SetNDC();
     lumi_label->Draw();
+    myBox->Draw();
     gPad->Update();	
     TPaletteAxis * palette =(TPaletteAxis*)thisHist->GetListOfFunctions()->FindObject("palette");
     palette->SetX2NDC(0.92);
@@ -669,7 +673,7 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
 	double quantile;
 
 	for(int eta = 0; eta < numEtaBins; eta++){
-        if(etaBins[eta] != 1.4442 && etaBins[eta+1] != 1.566){
+        if(eta != 4){
             for(int apd = 0; apd < 100; apd++){
                 
                 mean11 = e1_0_hists[eta][99-apd]->GetMean();
@@ -706,7 +710,7 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
                 mean21 = e2_0_hists[eta][99-apd]->GetMean();
                 mean22 = g2_0_hists[eta][99-apd]->GetMean();
                 mean2_0->SetBinContent(eta + 1, apd + 1, ((mean22/mean21) ));
-                systematics2[apd][0]->SetBinContent(eta+1, mean22/mean21);
+                std::cout << mean21 << " " << mean22 << std::endl;
 
                 mean21 = e2_1_hists[eta][99-apd]->GetMean();
                 mean22 = g2_1_hists[eta][99-apd]->GetMean();
@@ -813,22 +817,13 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
 #endif
     outputRatioHists->Close();
 
-    myLookUpTableProducer::plot_LookUpTable(ratio_0, "ratioLookUpTable_EB_R9_0", 0., 1.44419, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_1, "ratioLookUpTable_EB_R9_1", 0., 1.44419, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_2, "ratioLookUpTable_EB_R9_2", 0., 1.44419, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_3, "ratioLookUpTable_EB_R9_3", 0., 1.44419, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_4, "ratioLookUpTable_EB_R9_4", 0., 1.44419, -15, 15);
+    myLookUpTableProducer::plot_LookUpTable(ratio_0, "ratioLookUpTable_EB_R9_0", 0., 2.499, -0.3, 0.3);
+    myLookUpTableProducer::plot_LookUpTable(ratio_1, "ratioLookUpTable_EB_R9_1", 0., 2.499, -0.3, 0.3);
+    myLookUpTableProducer::plot_LookUpTable(ratio_2, "ratioLookUpTable_EB_R9_2", 0., 2.499, -0.3, 0.3);
+    myLookUpTableProducer::plot_LookUpTable(ratio_3, "ratioLookUpTable_EB_R9_3", 0., 2.499, -0.3, 0.3);
+    myLookUpTableProducer::plot_LookUpTable(ratio_4, "ratioLookUpTable_EB_R9_4", 0., 2.499, -0.3, 0.3);
 #ifdef ALT_R9
-    myLookUpTableProducer::plot_LookUpTable(ratio_5, "ratioLookUpTable_EB_R9_5", 0., 1.44419, -15, 15);
-#endif
-
-    myLookUpTableProducer::plot_LookUpTable(ratio_EE_0,"ratioLookUpTable_EE_R9_0", 1.566, 2.499, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_EE_1,"ratioLookUpTable_EE_R9_1", 1.566, 2.499, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_EE_2,"ratioLookUpTable_EE_R9_2", 1.566, 2.499, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_EE_3,"ratioLookUpTable_EE_R9_3", 1.566, 2.499, -15, 15);
-    myLookUpTableProducer::plot_LookUpTable(ratio_EE_4,"ratioLookUpTable_EE_R9_4", 1.566, 2.499, -15, 15);
-#ifdef ALT_R9
-    myLookUpTableProducer::plot_LookUpTable(ratio_EE_5,"ratioLookUpTable_EE_R9_5", 1.566, 2.499, -15, 15);
+    myLookUpTableProducer::plot_LookUpTable(ratio_5, "ratioLookUpTable_EB_R9_5", 0., 2.499, -0.3, 0.3);
 #endif
 
     std::cout << std::endl << "[INFO] ratio look-up tables have been produced ... " << std::endl;
