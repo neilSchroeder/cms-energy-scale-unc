@@ -52,6 +52,7 @@ bool _flag_crossChecks = false;
 bool _flag_truncate = false;
 bool _flag_tex = true;
 bool _flag_ratio = false;
+bool _flag_median = false;
 
 int main( int argc, char **argv ){
     using namespace boost;
@@ -83,6 +84,7 @@ int main( int argc, char **argv ){
         ("usingPions", opts::bool_switch(&usingPions), "If you are using pions instead of photons for this production, enable this option (disabled by default)")        
         ("crossCheck", opts::bool_switch(&_flag_crossChecks), "Produce crossCheck plots")
         ("trunc", opts::bool_switch(&_flag_truncate), "Activating this option will truncate plots before obtaining the mean")
+        ("median", opts::bool_switch(&_flag_median), "Use the median instead of the mean to evaluate systematics")
         ("ratio", opts::bool_switch(&_flag_ratio), "DEVELOPER OPTION, USE WITH CAUTION \nwill produce the ratio files used for the corrections")
         ("force", opts::bool_switch(&force), "If you want to reproduce your root file, turn this option on (disabled by default)")        
     ;
@@ -183,7 +185,7 @@ int main( int argc, char **argv ){
         hist_producer.produce_PION_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
     }
     else{
-        std::string temp_filename = DIRECTORY_NAME+rootFileOut+".root";
+        std::string temp_filename = DIRECTORY_NAME+"/"+rootFileOut+".root";
         std::cout << info << "Looking for a root file called: " << temp_filename << std::endl;
         if(force) hist_producer.produce_FNUF_Histograms(eleInputFile, phoInputFile, rootFileOut, DIRECTORY_NAME);
         else{
@@ -208,7 +210,7 @@ int main( int argc, char **argv ){
         syst_plotter.produce_2016_2017_Plots(rootFileOut, boostedSystematics);
     }
 
-    if(_flag_tex){
+    if(!_flag_tex){
 
     /////////////////////////////////////////
     // turn the .dat files into tex tables //
@@ -223,7 +225,6 @@ int main( int argc, char **argv ){
         system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2016_"+energy+".dat' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2016_"+energy+"'").c_str()); 
         system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2017_"+energy+".dat' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2017_"+energy+"'").c_str()); 
         system(std::string("python ./python/createTexTables.py -i './"+DIRECTORY_NAME+"/fnuf_systematics_2018_"+energy+".dat' -o './"+DIRECTORY_NAME+"/tex/fnuf_systematics_2018_"+energy+"'").c_str()); 
-
 
     }
 

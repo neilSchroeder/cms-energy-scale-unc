@@ -38,6 +38,7 @@
 extern std::string DIRECTORY_NAME;
 extern bool _flag_crossChecks;
 extern bool _flag_truncate;
+extern bool _flag_median;
 
 double laser_response_2016 [7] = {0.93, 0.93, 0.92, 0.91, 0.82, 0.72, 0.56};
 double laser_response_2017 [7] = {0.91, 0.90, 0.89, 0.88, 0.77, 0.65, 0.45};
@@ -300,6 +301,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     double muNatError;
     double finalVal;
     double correction;
+    double median = 0.5;
     for(int eta = 0; eta < numEtaBins; eta++){
         if(eta != 4){
             for(int apd = 35; apd < 99; apd++){
@@ -317,14 +319,29 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                         }
                     }
                 }
-                double correction_norm = std::max( fabs(low_ratio_0->GetBinContent(eta+1, apd+1)), fabs(high_ratio_0->GetBinContent(eta+1, apd+1)));
-                double correction_front = fabs(front_ratio_0->GetBinContent(eta+1, apd+1));
                 if(_flag_truncate){
                     e_0_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
                     g_0_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    e_1_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    g_1_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    e_2_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    g_2_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    e_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    g_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    e_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                    g_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
                 }
-                mean1 = e_0_hists[eta][99-apd]->GetMean();
-                mean2 = g_0_hists[eta][99-apd]->GetMean();
+
+                double correction_norm = std::max( fabs(low_ratio_0->GetBinContent(eta+1, apd+1)), fabs(high_ratio_0->GetBinContent(eta+1, apd+1)));
+                double correction_front = fabs(front_ratio_0->GetBinContent(eta+1, apd+1));
+                if(_flag_median){
+                    e_0_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
+                    g_0_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
+                }
+                else{
+                    mean1 = e_0_hists[eta][99-apd]->GetMean();
+                    mean2 = g_0_hists[eta][99-apd]->GetMean();
+                }
                 error1 = e_0_hists[eta][99-apd]->GetRMS()/sqrt(e_0_hists[eta][99-apd]->GetEntries());
                 error2 = g_0_hists[eta][99-apd]->GetRMS()/sqrt(g_0_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
@@ -347,9 +364,13 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 
                 correction_norm = std::max( fabs(low_ratio_1->GetBinContent(eta+1, apd+1)), fabs(high_ratio_1->GetBinContent(eta+1, apd+1)));
                 correction_front = fabs(front_ratio_1->GetBinContent(eta+1, apd+1));
-                if(_flag_truncate){
-                    e_1_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
-                    g_1_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                if(_flag_median){
+                    e_1_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
+                    g_1_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
+                }
+                else{
+                    mean1 = e_1_hists[eta][99-apd]->GetMean();
+                    mean2 = g_1_hists[eta][99-apd]->GetMean();
                 }
                 mean1 = e_1_hists[eta][99-apd]->GetMean();
                 mean2 = g_1_hists[eta][99-apd]->GetMean();
@@ -375,9 +396,13 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 
                 correction_norm = std::max( fabs(low_ratio_2->GetBinContent(eta+1, apd+1)), fabs(high_ratio_2->GetBinContent(eta+1, apd+1)));
                 correction_front = fabs(front_ratio_2->GetBinContent(eta+1, apd+1));
-                if(_flag_truncate){
-                    e_2_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
-                    g_2_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                if(_flag_median){
+                    e_2_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
+                    g_2_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
+                }
+                else{
+                    mean1 = e_2_hists[eta][99-apd]->GetMean();
+                    mean2 = g_2_hists[eta][99-apd]->GetMean();
                 }
                 mean1 = e_2_hists[eta][99-apd]->GetMean();
                 mean2 = g_2_hists[eta][99-apd]->GetMean();
@@ -403,9 +428,13 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 
                 correction_norm = std::max( fabs(low_ratio_3->GetBinContent(eta+1, apd+1)), fabs(high_ratio_3->GetBinContent(eta+1, apd+1)));
                 correction_front = fabs(front_ratio_3->GetBinContent(eta+1, apd+1));
-                if(_flag_truncate){
-                    e_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
-                    g_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                if(_flag_median){
+                    e_3_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
+                    g_3_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
+                }
+                else{
+                    mean1 = e_3_hists[eta][99-apd]->GetMean();
+                    mean2 = g_3_hists[eta][99-apd]->GetMean();
                 }
                 mean1 = e_3_hists[eta][99-apd]->GetMean();
                 mean2 = g_3_hists[eta][99-apd]->GetMean();
@@ -431,12 +460,14 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 
                 correction_norm = std::max( fabs(low_ratio_4->GetBinContent(eta+1, apd+1)), fabs(high_ratio_4->GetBinContent(eta+1, apd+1)));
                 correction_front = fabs(front_ratio_4->GetBinContent(eta+1, apd+1));
-                if(_flag_truncate){
-                    e_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
-                    g_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                if(_flag_median){
+                    e_4_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
+                    g_4_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
                 }
-                mean1 = e_4_hists[eta][99-apd]->GetMean();
-                mean2 = g_4_hists[eta][99-apd]->GetMean();
+                else{
+                    mean1 = e_4_hists[eta][99-apd]->GetMean();
+                    mean2 = g_4_hists[eta][99-apd]->GetMean();
+                }
                 error1 = e_4_hists[eta][99-apd]->GetRMS()/sqrt(e_4_hists[eta][99-apd]->GetEntries());
                 error2 = g_4_hists[eta][99-apd]->GetRMS()/sqrt(g_4_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
@@ -891,7 +922,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -0.02, -999);
 
     region = "combined";
-    mySystematicsPlotter::plot_year(systematics2016_0, systematics2016_1, systematics2016_2, systematics2016_3, systematics2016_4, "2016", energy, region, -0.05, 1);
+    mySystematicsPlotter::plot_year(systematics2016_0, systematics2016_1, systematics2016_2, systematics2016_3, systematics2016_4, "2016", energy, region, -0.10, 1);
     mySystematicsPlotter::plot_year(systematics2017_0, systematics2017_1, systematics2017_2, systematics2017_3, systematics2017_4, "2017", energy, region, -999, -999);
     mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -999, -999);
 

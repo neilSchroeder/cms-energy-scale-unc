@@ -36,6 +36,7 @@
 //#define check
 
 extern std::string DIRECTORY_NAME;
+extern bool _flag_median;
 /// Produce FNUF Histograms only analyzes two files at a time
 
 void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corrections){
@@ -251,43 +252,74 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 #ifdef ALT_R9
                 double correction_5 = 1 + std::max(fabs(high_ratio_5->GetBinContent(eta+1, apd+1)), fabs(low_ratio_5->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_5->GetBinContent(eta+1,apd+1)/100.);
 #endif
-                
-                mean1 = e_0_hists[eta][99-apd]->GetMean();
-                mean2 = g_0_hists[eta][99-apd]->GetMean();
-                if(corrections) mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_0);
-                else mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                std::cout << mean1 << " " << mean2 << std::endl;
+                if(!_flag_median){
+                    mean1 = e_0_hists[eta][99-apd]->GetMean();
+                    mean2 = g_0_hists[eta][99-apd]->GetMean();
+                    if(corrections) mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_0);
+                    else mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                    std::cout << mean1 << " " << mean2 << std::endl;
 
-                mean1 = e_1_hists[eta][99-apd]->GetMean();
-                mean2 = g_1_hists[eta][99-apd]->GetMean();
-                if(corrections) mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_1);
-                else mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                std::cout << mean1 << " " << mean2 << std::endl;
+                    mean1 = e_1_hists[eta][99-apd]->GetMean();
+                    mean2 = g_1_hists[eta][99-apd]->GetMean();
+                    if(corrections) mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_1);
+                    else mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                    std::cout << mean1 << " " << mean2 << std::endl;
 
-                mean1 = e_2_hists[eta][99-apd]->GetMean();
-                mean2 = g_2_hists[eta][99-apd]->GetMean();
-                if(corrections) mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_2);
-                else mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                std::cout << mean1 << " " << mean2 << std::endl;
+                    mean1 = e_2_hists[eta][99-apd]->GetMean();
+                    mean2 = g_2_hists[eta][99-apd]->GetMean();
+                    if(corrections) mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_2);
+                    else mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                    std::cout << mean1 << " " << mean2 << std::endl;
 
-                mean1 = e_3_hists[eta][99-apd]->GetMean();
-                mean2 = g_3_hists[eta][99-apd]->GetMean();
-                if(corrections) mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_3);
-                else mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                std::cout << mean1 << " " << mean2 << std::endl;
+                    mean1 = e_3_hists[eta][99-apd]->GetMean();
+                    mean2 = g_3_hists[eta][99-apd]->GetMean();
+                    if(corrections) mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_3);
+                    else mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                    std::cout << mean1 << " " << mean2 << std::endl;
 
-                mean1 = e_4_hists[eta][99-apd]->GetMean();
-                mean2 = g_4_hists[eta][99-apd]->GetMean();
-                if(corrections) mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_4);
-                else mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                    mean1 = e_4_hists[eta][99-apd]->GetMean();
+                    mean2 = g_4_hists[eta][99-apd]->GetMean();
+                    if(corrections) mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_4);
+                    else mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
-                std::cout << mean1 << " " << mean2 << std::endl << std::endl;
+                    std::cout << mean1 << " " << mean2 << std::endl << std::endl;
 #ifdef ALT_R9
-                mean1 = e_5_hists[eta][99-apd]->GetMean();
-                mean2 = g_5_hists[eta][99-apd]->GetMean();
-                if(corrections) mean_5->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_5);
-                else mean_5->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
+                    mean1 = e_5_hists[eta][99-apd]->GetMean();
+                    mean2 = g_5_hists[eta][99-apd]->GetMean();
+                    if(corrections) mean_5->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_5);
+                    else mean_5->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 #endif
+                }
+                else{
+                    double median = 0.5;
+                    double thisMedian1, thisMedian2;
+
+                    e_0_hists[eta][99-apd]->GetQuantiles(1, &thisMedian1, &median);
+                    g_0_hists[eta][99-apd]->GetQuantiles(1, &thisMedian2, &median);
+                    if(corrections) mean_0->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1)*correction_0);
+                    else mean_0->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1));
+
+                    e_1_hists[eta][99-apd]->GetQuantiles(1, &thisMedian1, &median);
+                    g_1_hists[eta][99-apd]->GetQuantiles(1, &thisMedian2, &median);
+                    if(corrections) mean_1->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1)*correction_1);
+                    else mean_1->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1));
+
+                    e_2_hists[eta][99-apd]->GetQuantiles(1, &thisMedian1, &median);
+                    g_2_hists[eta][99-apd]->GetQuantiles(1, &thisMedian2, &median);
+                    if(corrections) mean_2->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1)*correction_2);
+                    else mean_2->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1));
+
+                    e_3_hists[eta][99-apd]->GetQuantiles(1, &thisMedian1, &median);
+                    g_3_hists[eta][99-apd]->GetQuantiles(1, &thisMedian2, &median);
+                    if(corrections) mean_3->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1)*correction_3);
+                    else mean_3->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1));
+
+                    e_4_hists[eta][99-apd]->GetQuantiles(1, &thisMedian1, &median);
+                    g_4_hists[eta][99-apd]->GetQuantiles(1, &thisMedian2, &median);
+                    if(corrections) mean_4->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1)*correction_4);
+                    else mean_4->SetBinContent(eta+1, apd+1, 100*((thisMedian2/thisMedian1) - 1));
+                }   
+
                 delete e_0_hists[eta][99-apd];
                 delete g_0_hists[eta][99-apd];
                 delete e_1_hists[eta][99-apd];
