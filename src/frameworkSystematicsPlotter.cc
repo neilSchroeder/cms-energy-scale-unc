@@ -38,6 +38,7 @@
 extern std::string DIRECTORY_NAME;
 extern bool _flag_crossChecks;
 extern bool _flag_truncate;
+extern bool _flag_varTrunc;
 extern bool _flag_median;
 
 double laser_response_2016 [7] = {0.93, 0.93, 0.92, 0.91, 0.82, 0.72, 0.56};
@@ -330,6 +331,53 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                     g_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
                     e_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
                     g_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
+                }
+                else if(_flag_varTrunc){
+                    double x1 = 0;
+                    double x2 = 0;
+                    double x3 = 0;
+                    double x4 = 0;
+                    double x5 = 0;
+                    for(int i = e_0_hists[eta][99-apd]->GetNbinsX(); i > 0; i --){
+                        if(e_0_hists[eta][99-apd]->GetBinContent(i) > 0 && g_0_hists[eta][99-apd]->GetBinContent(i) > 0){
+                            x1 = e_0_hists[eta][99-apd]->GetBinLowEdge(i+1);
+                            break;
+                        }
+                    }
+                    for(int i = e_1_hists[eta][99-apd]->GetNbinsX(); i > 0; i --){
+                        if(e_1_hists[eta][99-apd]->GetBinContent(i) > 0 && g_1_hists[eta][99-apd]->GetBinContent(i) > 0){
+                            x2 = e_0_hists[eta][99-apd]->GetBinLowEdge(i+1);
+                            break;
+                        }
+                    }
+                    for(int i = e_2_hists[eta][99-apd]->GetNbinsX(); i > 0; i --){
+                        if(e_2_hists[eta][99-apd]->GetBinContent(i) > 0 && g_2_hists[eta][99-apd]->GetBinContent(i) > 0){
+                            x3 = e_0_hists[eta][99-apd]->GetBinLowEdge(i+1);
+                            break;
+                        }
+                    }
+                    for(int i = e_3_hists[eta][99-apd]->GetNbinsX(); i > 0; i --){
+                        if(e_3_hists[eta][99-apd]->GetBinContent(i) > 0 && g_3_hists[eta][99-apd]->GetBinContent(i) > 0){
+                            x4 = e_0_hists[eta][99-apd]->GetBinLowEdge(i+1);
+                            break;
+                        }
+                    }
+                    for(int i = e_4_hists[eta][99-apd]->GetNbinsX(); i > 0; i --){
+                        if(e_4_hists[eta][99-apd]->GetBinContent(i) > 0 && g_4_hists[eta][99-apd]->GetBinContent(i) > 0){
+                            x5 = e_0_hists[eta][99-apd]->GetBinLowEdge(i+1);
+                            break;
+                        }
+                    }
+                    e_0_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x1);
+                    g_0_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x1);
+                    e_1_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x2);
+                    g_1_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x2);
+                    e_2_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x3);
+                    g_2_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x3);
+                    e_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x4);
+                    g_3_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x4);
+                    e_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x5);
+                    g_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x5);
                 }
 
                 double correction_norm = std::max( fabs(low_ratio_0->GetBinContent(eta+1, apd+1)), fabs(high_ratio_0->GetBinContent(eta+1, apd+1)));

@@ -33,7 +33,7 @@
 #include "../interface/frameworkHistogramProducer.h"
 
 //#define ETA_VETO
-//#define EVENT_INFO
+#define EVENT_INFO
 //#define ALT_R9
 
 extern std::string DIRECTORY_NAME; 

@@ -53,6 +53,7 @@ bool _flag_truncate = false;
 bool _flag_tex = true;
 bool _flag_ratio = false;
 bool _flag_median = false;
+bool _flag_varTrunc = false;
 
 int main( int argc, char **argv ){
     using namespace boost;
@@ -84,6 +85,7 @@ int main( int argc, char **argv ){
         ("usingPions", opts::bool_switch(&usingPions), "If you are using pions instead of photons for this production, enable this option (disabled by default)")        
         ("crossCheck", opts::bool_switch(&_flag_crossChecks), "Produce crossCheck plots")
         ("trunc", opts::bool_switch(&_flag_truncate), "Activating this option will truncate plots before obtaining the mean")
+        ("varTrunc", opts::bool_switch(&_flag_varTrunc), "Activating this option will truncate plot using a variable scheme before obtaining the mean")
         ("median", opts::bool_switch(&_flag_median), "Use the median instead of the mean to evaluate systematics")
         ("ratio", opts::bool_switch(&_flag_ratio), "DEVELOPER OPTION, USE WITH CAUTION \nwill produce the ratio files used for the corrections")
         ("force", opts::bool_switch(&force), "If you want to reproduce your root file, turn this option on (disabled by default)")        
