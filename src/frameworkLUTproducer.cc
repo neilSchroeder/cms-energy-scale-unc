@@ -33,6 +33,7 @@
 
 //#define ETA_VETO
 //#define ALT_R9
+//#define ALT_ETA
 //#define check
 
 extern std::string DIRECTORY_NAME;
@@ -50,8 +51,13 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
-	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#ifdef ALT_ETA
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.3, 2.5};
+#else
+    int numEtaBins = 8;
+    double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
 
 
 	TFile* myHistograms = new TFile(fileName.c_str(), "READ");
@@ -242,7 +248,7 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 	double ratio;
 	double quantile;
 	for(int eta = 0; eta < numEtaBins; eta++){
-        if(etaBins[eta] != 1.4442 && etaBins[eta+1] != 1.566){
+        if(eta != 4){
             for(int apd = 0; apd < 100; apd++){
                 double correction_0 = 1 + std::max(fabs(high_ratio_0->GetBinContent(eta+1, apd+1)), fabs(low_ratio_0->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_0->GetBinContent(eta+1,apd+1)/100.);
                 double correction_1 = 1 + std::max(fabs(high_ratio_1->GetBinContent(eta+1, apd+1)), fabs(low_ratio_1->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_1->GetBinContent(eta+1,apd+1)/100.);
@@ -257,32 +263,27 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
                     mean2 = g_0_hists[eta][99-apd]->GetMean();
                     if(corrections) mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_0);
                     else mean_0->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                    std::cout << mean1 << " " << mean2 << std::endl;
 
                     mean1 = e_1_hists[eta][99-apd]->GetMean();
                     mean2 = g_1_hists[eta][99-apd]->GetMean();
                     if(corrections) mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_1);
                     else mean_1->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                    std::cout << mean1 << " " << mean2 << std::endl;
 
                     mean1 = e_2_hists[eta][99-apd]->GetMean();
                     mean2 = g_2_hists[eta][99-apd]->GetMean();
                     if(corrections) mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_2);
                     else mean_2->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                    std::cout << mean1 << " " << mean2 << std::endl;
 
                     mean1 = e_3_hists[eta][99-apd]->GetMean();
                     mean2 = g_3_hists[eta][99-apd]->GetMean();
                     if(corrections) mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_3);
                     else mean_3->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
-                    std::cout << mean1 << " " << mean2 << std::endl;
 
                     mean1 = e_4_hists[eta][99-apd]->GetMean();
                     mean2 = g_4_hists[eta][99-apd]->GetMean();
                     if(corrections) mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1)*correction_4);
                     else mean_4->SetBinContent(eta + 1, apd + 1, 100*((mean2/mean1) - 1));
 
-                    std::cout << mean1 << " " << mean2 << std::endl << std::endl;
 #ifdef ALT_R9
                     mean1 = e_5_hists[eta][99-apd]->GetMean();
                     mean2 = g_5_hists[eta][99-apd]->GetMean();
@@ -371,9 +372,13 @@ void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title,
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
-
-	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#ifdef ALT_ETA
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.3, 2.5};
+#else
+    int numEtaBins = 9;
+    double etaBins[9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
     TCanvas * a = new TCanvas("a", "", 1600, 1200);
     if( !(thisHist) ) std::cout << "[ERROR] could not open historgram: " << thisHist->GetName() << std::endl;
     a->cd();
@@ -429,8 +434,13 @@ void myLookUpTableProducer::produce_RatioLookUpTables(std::string fileName1, std
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
-	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#ifdef ALT_Eta
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.3, 2.5};
+#else
+    int numEtaBins = 8;
+    double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
 
     std::cout << "begin producing ratio look-up tables... " << std::endl;
 

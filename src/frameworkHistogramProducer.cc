@@ -32,14 +32,19 @@
 #include <TTree.h> 
 #include "../interface/frameworkHistogramProducer.h"
 
+//#define DEBUG
 //#define ETA_VETO
-#define EVENT_INFO
+//#define EVENT_INFO
 //#define ALT_R9
+//#define ALT_ETA
+//#define DOITWRONG
 
 extern std::string DIRECTORY_NAME; 
 
 /// Produce FNUF Histograms only analyzes two files at a time
 void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::string pho_file, std::string outputFileName, std::string outputDirectoryName){
+    TH1F * distEta_ele = new TH1F("distEta_ele", "", 200, -2.5, 2.5);
+    TH1F * distEta_pho = new TH1F("distEta_pho", "", 200, -2.5, 2.5);
     std::string ret = "";
 
     std::cout << "[INFO] Electron File: " << ele_file << "\n[INFO] Photon File: " << pho_file << std::endl;
@@ -53,8 +58,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
-	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#ifdef ALT_ETA
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.4, 2.5};
+#else
+    int numEtaBins = 8;
+    double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
 
     int apdBins = 100;
     double apdMin = 0;
@@ -212,61 +222,83 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 	double linearEnergies2 [8];
 	float dr [2];
 	float seedCrystalRatio [2];
-	int showerMaxBin [2];
-	float supClustCrystals [2];
-	Long64_t run, event, lum;
+    int showerMaxBin [2];
+    float supClustCrystals [2];
+    Long64_t run, event, lum;
 
-	//File stuffs
+    //File stuffs
     std::ifstream in;
-	in.open( ele_file.c_str() );
+    in.open( ele_file.c_str() );
 
     std::string rootFile;
-	bool noVeto = true;
-	// by my own convention this loop will be the electron loop
+    bool noVeto = true;
+    // by my own convention this loop will be the electron loop
     while( in >> rootFile){
         if(TFile::Open(rootFile.c_str(), "READ")){
-        TFile * myFile = TFile::Open(rootFile.c_str());
-        if(!(myFile->IsZombie())){
-            TIter next(myFile->GetListOfKeys());
-            TKey *key;
-            while( (key = (TKey*)next()) ){
-                std::string ntuples = "ntuples";
-                if(rootFile.find("High") != std::string::npos) ntuples = "ntuplesHigh";
-                if(rootFile.find("Low") != std::string::npos) ntuples = "ntuplesLow";
-                if( ntuples.compare(key->GetName()) == 0 ){
-                    std::string folder = "ntuples/data";
-                    if(rootFile.find("High") != std::string::npos) folder = "ntuplesHigh/data";
-                    if(rootFile.find("Low") != std::string::npos) folder = "ntuplesLow/data";
-                    TTree * thisTTree = (TTree*)myFile->Get(folder.c_str());
-                    thisTTree->SetBranchAddress("RECO_Energy", energyR);
-                    thisTTree->SetBranchAddress("Super_Cluster_Raw_Energy", rawSuperClusterEnergy);
-                    thisTTree->SetBranchAddress("Rechit_Energy_Sum_1", def_nomiRecHitSum);
-                    thisTTree->SetBranchAddress("apd_lce_RecHitSums1", apd_lce_RecHitSums1);
-                    thisTTree->SetBranchAddress("apd_lce_RecHitSums2", apd_lce_RecHitSums2);
-                    thisTTree->SetBranchAddress("Gen_Energy", energyG);
-                    thisTTree->SetBranchAddress("R9", R9);
-                    thisTTree->SetBranchAddress("Full_5x5_R9", full5x5_R9);
-                    thisTTree->SetBranchAddress("Reco_Eta", eta);
-                    thisTTree->SetBranchAddress("Super_Cluster_Eta", etaSC);
-                    thisTTree->SetBranchAddress("Gen_Eta", etaS);
-                    thisTTree->SetBranchAddress("Reco_Phi", phi);
-                    thisTTree->SetBranchAddress("Gen_Phi", phiS);
-                    thisTTree->SetBranchAddress("dR", dr);
-                    //thisTTree->SetBranchAddress("Super_Cluster_Crystals", supClustCrystals);
-                    //thisTTree->SetBranchAddress("Shower_Max_Bin", showerMaxBin);
-                    thisTTree->SetBranchAddress("run", &run);
-                    thisTTree->SetBranchAddress("event", &event);
-                    thisTTree->SetBranchAddress("lum", &lum);
+            TFile * myFile = TFile::Open(rootFile.c_str());
+            if(!(myFile->IsZombie())){
+                TIter next(myFile->GetListOfKeys());
+                TKey *key;
+                while( (key = (TKey*)next()) ){
+                    std::string ntuples = "ntuples";
+                    if(rootFile.find("High") != std::string::npos) ntuples = "ntuplesHigh";
+                    if(rootFile.find("Low") != std::string::npos) ntuples = "ntuplesLow";
+                    if( ntuples.compare(key->GetName()) == 0 ){
+                        std::string folder = "ntuples/data";
+                        if(rootFile.find("High") != std::string::npos) folder = "ntuplesHigh/data";
+                        if(rootFile.find("Low") != std::string::npos) folder = "ntuplesLow/data";
+                        TTree * thisTTree = (TTree*)myFile->Get(folder.c_str());
+                        thisTTree->SetBranchAddress("RECO_Energy", energyR);
+                        thisTTree->SetBranchAddress("Super_Cluster_Raw_Energy", rawSuperClusterEnergy);
+                        thisTTree->SetBranchAddress("Rechit_Energy_Sum_1", def_nomiRecHitSum);
+                        thisTTree->SetBranchAddress("apd_lce_RecHitSums1", apd_lce_RecHitSums1);
+                        thisTTree->SetBranchAddress("apd_lce_RecHitSums2", apd_lce_RecHitSums2);
+                        thisTTree->SetBranchAddress("Gen_Energy", energyG);
+                        thisTTree->SetBranchAddress("R9", R9);
+                        thisTTree->SetBranchAddress("Full_5x5_R9", full5x5_R9);
+                        thisTTree->SetBranchAddress("Reco_Eta", eta);
+                        thisTTree->SetBranchAddress("Super_Cluster_Eta", etaSC);
+                        thisTTree->SetBranchAddress("Gen_Eta", etaS);
+                        thisTTree->SetBranchAddress("Reco_Phi", phi);
+                        thisTTree->SetBranchAddress("Gen_Phi", phiS);
+                        thisTTree->SetBranchAddress("dR", dr);
+                        //thisTTree->SetBranchAddress("Super_Cluster_Crystals", supClustCrystals);
+                        //thisTTree->SetBranchAddress("Shower_Max_Bin", showerMaxBin);
+                        thisTTree->SetBranchAddress("run", &run);
+                        thisTTree->SetBranchAddress("event", &event);
+                        thisTTree->SetBranchAddress("lum", &lum);
 
-                    /////////////////////////////////////////////////////////////////////////////////////////////
-                    //this part of the code fills the histograms
-                    for(Long64_t treeIndex = 0; treeIndex < thisTTree->GetEntries(); treeIndex++){
-                        thisTTree->GetEntry(treeIndex);
-                        if( dr[0] != 999 && dr[1] != 999){
+                        /////////////////////////////////////////////////////////////////////////////////////////////
+                        //this part of the code fills the histograms
+                        for(Long64_t treeIndex = 0; treeIndex < thisTTree->GetEntries(); treeIndex++){
+                            thisTTree->GetEntry(treeIndex);
+#ifdef DEBUG
+                            std::cout << etaSC[0] << " " << eta[0] << std::endl;
+                            std::cout << etaSC[1] << " " << eta[1] << std::endl;
+                            std::cout << full5x5_R9[0] << " " << R9[0] << std::endl;
+                            std::cout << full5x5_R9[1] << " " << R9[1] << std::endl;
+#endif
+                            if(etaSC[0] == -999 && eta[0] != -999) etaSC[0] = eta[0];
+                            if(etaSC[1] == -999 && eta[1] != -999) etaSC[1] = eta[1];
+                            if(full5x5_R9[0] == -999 && R9[0] != -999) full5x5_R9[0] = R9[0];
+                            if(full5x5_R9[1] == -999 && R9[1] != -999) full5x5_R9[1] = R9[1];
+#ifdef DEBUG
+                            std::cout << etaSC[0] << " " << eta[0] << std::endl;
+                            std::cout << etaSC[1] << " " << eta[1] << std::endl;
+#endif
                             //determine which eta bin the first electron falls into
+#ifdef DOITWRONG
                             int etaIndex1 = fabs(etaSC[0])/(2.5/(double)numEtaBins);
-                            int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);;
-                            for(int i = 0; i < numEtaBins - 1 ; i++){
+                            int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);
+#else
+                            int etaIndex1 = -1;
+                            int etaIndex2 = -1;
+#endif
+#ifdef DOITWRONG
+                            for(int i = 0; i < numEtaBins-1; i++){
+#else
+                            for(int i = 0; i < numEtaBins; i++){
+#endif
                                 if( fabs(etaSC[0]) > etaBins[i] && fabs(etaSC[0]) < etaBins[i+1]){
                                     etaIndex1 = i;
                                 }
@@ -277,18 +309,15 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                             //the following if statement is just a catch for particles
                             //     with an eta more than 2.5
 
-
-                            if( etaIndex1 < numEtaBins && etaIndex2 < numEtaBins){
+#ifdef DOITWRONG
+                            if(etaIndex1 < numEtaBins && etaIndex2 < numEtaBins){
+#else
+                            if(etaIndex1 != -1){
+#endif
+                                distEta_ele->Fill(etaSC[0]);
                                 noVeto = true;
 #ifdef ETA_VETO
                                 if(fabs(etaSC[0]) < 0.024) noVeto = false;
-                                if(fabs(etaSC[0]) > 0.432 && fabs(etaSC[0]) < 0.456) noVeto = false;
-                                if(fabs(etaSC[0]) > 0.768 && fabs(etaSC[0]) < 0.816) noVeto = false;
-                                if(fabs(etaSC[0]) > 1.128 && fabs(etaSC[0]) < 1.152) noVeto = false;
-#endif
-#ifdef ETA_VETO
-                                noVeto = true;
-                                if(fabs(etaSC[0]) < 0.024 ) noVeto = false;
                                 if(fabs(etaSC[0]) > 0.432 && fabs(etaSC[0]) < 0.456) noVeto = false;
                                 if(fabs(etaSC[0]) > 0.768 && fabs(etaSC[0]) < 0.816) noVeto = false;
                                 if(fabs(etaSC[0]) > 1.128 && fabs(etaSC[0]) < 1.152) noVeto = false;
@@ -328,6 +357,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                     }
 #endif
                                 }
+                            }
+#ifdef DOITWRONG
+                            if(etaIndex1 < numEtaBins && etaIndex2 < numEtaBins){
+#else
+                            if(etaIndex2 != -1){
+#endif
+                                distEta_ele->Fill(etaSC[1]);
 #ifdef ETA_VETO
                                 noVeto = true;
                                 if(fabs(etaSC[1]) < 0.024 ) noVeto = false;
@@ -336,106 +372,113 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                 if(fabs(etaSC[1]) > 1.128 && fabs(etaSC[1]) < 1.152) noVeto = false;
 #endif
                                 if(noVeto){
-                                if(full5x5_R9[1] > r9Bins[0] && full5x5_R9[1] < r9Bins[1]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_0[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[1] > r9Bins[1] && full5x5_R9[1] < r9Bins[2]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_1[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[1] > r9Bins[2] && full5x5_R9[1] < r9Bins[3]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_2[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[1] > r9Bins[3] && full5x5_R9[1] < r9Bins[4]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_3[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
-                                    }//end for apd bins
-                                }
-                                if(full5x5_R9[1] > r9Bins[4] && full5x5_R9[1] < r9Bins[5]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_4[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
-                                    }//end for apd bins
-                                }
+                                    if(full5x5_R9[1] > r9Bins[0] && full5x5_R9[1] < r9Bins[1]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_0[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[1] > r9Bins[1] && full5x5_R9[1] < r9Bins[2]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_1[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[1] > r9Bins[2] && full5x5_R9[1] < r9Bins[3]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_2[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[1] > r9Bins[3] && full5x5_R9[1] < r9Bins[4]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_3[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
+                                    if(full5x5_R9[1] > r9Bins[4] && full5x5_R9[1] < r9Bins[5]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_4[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
 #ifdef ALT_R9
-                                if(full5x5_R9[1] > r9Bins[5] && full5x5_R9[1] < r9Bins[6]){
-                                    for(int i = 0; i < 100; i++){
-                                        Histogramse_5[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
-                                    }//end for apd bins
-                                }
+                                    if(full5x5_R9[1] > r9Bins[5] && full5x5_R9[1] < r9Bins[6]){
+                                        for(int i = 0; i < 100; i++){
+                                            Histogramse_5[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
+                                        }//end for apd bins
+                                    }
 #endif
                                 }
                             }
-                        }//end if both particles are reconstructed
-                    }//end for tree index
-                }// end if found key named ntuples
-                else{
-                    std::cout << "[ERROR] Did not find directory 'ntuples' for file " << rootFile << std::endl;
-                    std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
-                }
-            }//end while keys
-        }//end if not zombie
-        else{
-            std::cout << "[ERROR] The file " << ele_file << " did not open properly" << std::endl;
-            std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
-        }
-        myFile->Close();
+                        }//end for tree index
+                    }// end if found key named ntuples
+                    else{
+                        std::cout << "[ERROR] Did not find directory 'ntuples' for file " << rootFile << std::endl;
+                        std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
+                    }
+                }//end while keys
+            }//end if not zombie
+            else{
+                std::cout << "[ERROR] The file " << ele_file << " did not open properly" << std::endl;
+                std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
+            }
+            myFile->Close();
         }//end if file opens
         else{
             std::cout << "[ERROR] the file " << rootFile << " did not open or does not exist" << std::endl;
             std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
         }
     }//end while files in
-	
-	in.close();
-	in.open( pho_file.c_str() );
 
-	// this loop will be the photon loop
+    in.close();
+    in.open( pho_file.c_str() );
+
+    // this loop will be the photon loop
     while( in >> rootFile){
         if(TFile::Open(rootFile.c_str(), "READ")){
-        TFile * myFile = TFile::Open(rootFile.c_str());
-        if(!(myFile->IsZombie())){
-            TIter next(myFile->GetListOfKeys());
-            TKey *key;
-            while( (key = (TKey*)next()) ){
-                std::string ntuples = "ntuples";
-                if(rootFile.find("High") != std::string::npos) ntuples = "ntuplesHigh";
-                if(rootFile.find("Low") != std::string::npos) ntuples = "ntuplesLow";
-                if( ntuples.compare(key->GetName()) == 0 ){
-                    std::string folder = "ntuples/data";
-                    if(ntuples.find("High") != std::string::npos) folder = "ntuplesHigh/data";
-                    if(ntuples.find("Low") != std::string::npos) folder = "ntuplesLow/data";
-                    TTree * thisTTree = (TTree*)myFile->Get(folder.c_str());
-                    thisTTree->SetBranchAddress("RECO_Energy", energyR);
-                    thisTTree->SetBranchAddress("Super_Cluster_Raw_Energy", rawSuperClusterEnergy);
-                    thisTTree->SetBranchAddress("Rechit_Energy_Sum_1", def_nomiRecHitSum);
-                    thisTTree->SetBranchAddress("apd_lce_RecHitSums1", apd_lce_RecHitSums1);
-                    thisTTree->SetBranchAddress("apd_lce_RecHitSums2", apd_lce_RecHitSums2);
-                    thisTTree->SetBranchAddress("Gen_Energy", energyG);
-                    thisTTree->SetBranchAddress("R9", R9);
-                    thisTTree->SetBranchAddress("Full_5x5_R9", full5x5_R9);
-                    thisTTree->SetBranchAddress("Reco_Eta", eta);
-                    thisTTree->SetBranchAddress("Super_Cluster_Eta", etaSC);
-                    thisTTree->SetBranchAddress("Gen_Eta", etaS);
-                    thisTTree->SetBranchAddress("Reco_Phi", phi);
-                    thisTTree->SetBranchAddress("Gen_Phi", phiS);
-                    thisTTree->SetBranchAddress("dR", dr);
-                    //thisTTree->SetBranchAddress("Super_Cluster_Crystals", supClustCrystals);
-                    //thisTTree->SetBranchAddress("Shower_Max_Bin", showerMaxBin);
-                    thisTTree->SetBranchAddress("run", &run);
-                    thisTTree->SetBranchAddress("event", &event);
-                    thisTTree->SetBranchAddress("lum", &lum);
+            TFile * myFile = TFile::Open(rootFile.c_str());
+            if(!(myFile->IsZombie())){
+                TIter next(myFile->GetListOfKeys());
+                TKey *key;
+                while( (key = (TKey*)next()) ){
+                    std::string ntuples = "ntuples";
+                    if(rootFile.find("High") != std::string::npos) ntuples = "ntuplesHigh";
+                    if(rootFile.find("Low") != std::string::npos) ntuples = "ntuplesLow";
+                    if( ntuples.compare(key->GetName()) == 0 ){
+                        std::string folder = "ntuples/data";
+                        if(ntuples.find("High") != std::string::npos) folder = "ntuplesHigh/data";
+                        if(ntuples.find("Low") != std::string::npos) folder = "ntuplesLow/data";
+                        TTree * thisTTree = (TTree*)myFile->Get(folder.c_str());
+                        thisTTree->SetBranchAddress("RECO_Energy", energyR);
+                        thisTTree->SetBranchAddress("Super_Cluster_Raw_Energy", rawSuperClusterEnergy);
+                        thisTTree->SetBranchAddress("Rechit_Energy_Sum_1", def_nomiRecHitSum);
+                        thisTTree->SetBranchAddress("apd_lce_RecHitSums1", apd_lce_RecHitSums1);
+                        thisTTree->SetBranchAddress("apd_lce_RecHitSums2", apd_lce_RecHitSums2);
+                        thisTTree->SetBranchAddress("Gen_Energy", energyG);
+                        thisTTree->SetBranchAddress("R9", R9);
+                        thisTTree->SetBranchAddress("Full_5x5_R9", full5x5_R9);
+                        thisTTree->SetBranchAddress("Reco_Eta", eta);
+                        thisTTree->SetBranchAddress("Super_Cluster_Eta", etaSC);
+                        thisTTree->SetBranchAddress("Gen_Eta", etaS);
+                        thisTTree->SetBranchAddress("Reco_Phi", phi);
+                        thisTTree->SetBranchAddress("Gen_Phi", phiS);
+                        thisTTree->SetBranchAddress("dR", dr);
+                        //thisTTree->SetBranchAddress("Super_Cluster_Crystals", supClustCrystals);
+                        //thisTTree->SetBranchAddress("Shower_Max_Bin", showerMaxBin);
+                        thisTTree->SetBranchAddress("run", &run);
+                        thisTTree->SetBranchAddress("event", &event);
+                        thisTTree->SetBranchAddress("lum", &lum);
 
-                    for(Long64_t treeIndex = 0; treeIndex < thisTTree->GetEntries(); treeIndex++){
-                        thisTTree->GetEntry(treeIndex);
-                        if( dr[0] != 999 && dr[1] != 999){
+                        for(Long64_t treeIndex = 0; treeIndex < thisTTree->GetEntries(); treeIndex++){
+                            thisTTree->GetEntry(treeIndex);
+#ifdef DOITWRONG
                             int etaIndex1 = fabs(etaSC[0])/(2.5/(double)numEtaBins);
                             int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);
-                            for(int i = 0; i < numEtaBins - 1 ; i++){
+#else
+                            int etaIndex1 = -1;
+                            int etaIndex2 = -1;
+#endif
+#ifdef DOITWRONG
+                            for(int i = 0; i < numEtaBins-1; i++){
+#else
+                            for(int i = 0; i < numEtaBins; i++){
+#endif
                                 if( fabs(etaSC[0]) > etaBins[i] && fabs(etaSC[0]) < etaBins[i+1]){
                                     etaIndex1 = i;
                                 }
@@ -443,7 +486,12 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                     etaIndex2 = i;
                                 }
                             }
+#ifdef DOITWRONG
                             if(etaIndex1 < numEtaBins && etaIndex2 < numEtaBins){
+#else
+                            if(etaIndex1 != -1){
+#endif
+                                distEta_pho->Fill(etaSC[0]);
 #ifdef ETA_VETO
                                 noVeto = true;
                                 if(fabs(etaSC[0]) < 0.024) noVeto = false;
@@ -487,6 +535,13 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                     }
 #endif
                                 }//end if veto
+                            }
+#ifdef DOITWRONG
+                            if(etaIndex1 < numEtaBins && etaIndex2 < numEtaBins){
+#else
+                            if(etaIndex2 != -1){
+#endif
+                                distEta_pho->Fill(etaSC[1]);
 #ifdef ETA_VETO
                                 noVeto = true;
                                 if(fabs(etaSC[1]) < 0.024) noVeto = false;
@@ -528,39 +583,38 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
                                     }
 #endif
                                 }
-                            }//end if the particles are inside 2.5
-                        }//end if both particles are reconstructed
-                    }//end for tree index
-                }//end if key == ntuples
-                else{
-                    std::cout << "[ERROR] Did not find directory 'ntuples' for file " << rootFile << std::endl;
-                    std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
-                }
-            }//end while keys
-        }//end if is zombie
-        else{
-            std::cout << "[ERROR] The file " << pho_file << " did not open correctly" << std::endl;
-            std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
-        }
-        myFile->Close();
+                            }
+                        }//end for tree index
+                    }//end if key == ntuples
+                    else{
+                        std::cout << "[ERROR] Did not find directory 'ntuples' for file " << rootFile << std::endl;
+                        std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
+                    }
+                }//end while keys
+            }//end if is zombie
+            else{
+                std::cout << "[ERROR] The file " << pho_file << " did not open correctly" << std::endl;
+                std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
+            }
+            myFile->Close();
         }
         else{
             std::cout << "[ERROR] The file " << pho_file << " did not open or does not exist" << std::endl;
             std::cout << "[ERROR-RECOVER] ... continuing without this file." << std::endl;
         }
     }//end while files in
-	
-	in.close();
+
+    in.close();
 
     // manage output directory
     //
     DIRECTORY_NAME = outputDirectoryName;
-    
-    
+
+
     std::cout << "[EXECUTE] source ./clean_up_directories.sh "+DIRECTORY_NAME << std::endl;
     system(std::string("source ./clean_up_directories.sh "+DIRECTORY_NAME).c_str());
     //////////////////////////////////////////////////////
-    
+
     std::string fileOut = DIRECTORY_NAME+outputFileName;
     if(fileOut.find(".root") == std::string::npos) fileOut = fileOut+".root";
 
@@ -568,10 +622,10 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
     std::cout<< "[INFO] files successfully analyzed... " << std::endl;
     std::cout<< "[INFO] begin writing to file `"<< fileOut << "' ..." << std::endl;
 
-	//////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
 
-	TFile * out = new TFile(fileOut.c_str(), "RECREATE");
-	out->cd();
+    TFile * out = new TFile(fileOut.c_str(), "RECREATE");
+    out->cd();
     for(int i = 0; i < numEtaBins; i++){
         for(int j = 0; j < apdBins; j++){
             Histogramse_0[i][j]->Write();
@@ -614,6 +668,8 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 #endif 
         }
     }
+    distEta_ele->Write();
+    distEta_pho->Write();
 
     out->Close();
     for(int i = 0; i < numEtaBins; i++){
@@ -634,8 +690,11 @@ void myHistogramProducer::produce_FNUF_Histograms( std::string ele_file, std::st
 #endif
         }
     }
+    delete distEta_ele;
+    delete distEta_pho;
+
     std::cout << "[STATUS] finished writing to file... " << std::endl;
-	return;
+    return;
 };
 
 
@@ -645,84 +704,84 @@ void myHistogramProducer::produce_PION_Histograms( std::string ele_file, std::st
     std::cout << "You are working with Pions" << std::endl;
     std::cout << "Electron File: " << ele_file << "\nPhoton File: " << pi_file << std::endl;
 
-	//declare some constants
+    //declare some constants
 
-	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+    int numEtaBins = 8;
+    double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
 
     int apdBins = 100;
     double apdMin = 0;
     double apdMax = 1;
 
-	//make the histograms
-	//note: plotting using this code has been temporarily disabled
+    //make the histograms
+    //note: plotting using this code has been temporarily disabled
 
-	//declare std::vectors for an iterative TH1 creation method
+    //declare std::vectors for an iterative TH1 creation method
 
-	std::vector< std::vector<TH1F*> > Histogramse_0;
-	std::vector< std::vector<TH1F*> > Histogramsg_0;
+    std::vector< std::vector<TH1F*> > Histogramse_0;
+    std::vector< std::vector<TH1F*> > Histogramsg_0;
 
-	char titleLow [50];
-	char titleHigh [50];
-	char tagLow [50];
-	char tagHigh [50];
-	std::vector<TH1F*> Histse_0;
-	std::vector<TH1F*> Histsg_0;
+    char titleLow [50];
+    char titleHigh [50];
+    char tagLow [50];
+    char tagHigh [50];
+    std::vector<TH1F*> Histse_0;
+    std::vector<TH1F*> Histsg_0;
 
-	int count = 1;
-	int bins = 125600;
-	//create the necessary histograms
-	for(int iii = 0; iii < numEtaBins; iii++){
-		double etaMax = ((double)iii+1)*(2.5/(double)numEtaBins);
-		double etaMin = (double)iii * 2.5/(double)numEtaBins;
-		double apd = 1;
-		for(int jjj = 0; jjj < 100; jjj++){
-			if( jjj > 0 ) apd -= 0.01;
-			sprintf( titleLow, "e R9_0, %lf < |#eta| < %lf, APD/PN = %lf", etaMin, etaMax, apd);
-			sprintf( titleHigh, "g R9_0, %lf < |#eta| < %lf, APD/PN = %lf", etaMin, etaMax, apd);
-			sprintf( tagLow, "e_0_%i_%i_%i", iii, iii+1, jjj);
-			sprintf( tagHigh, "g_0_%i_%i_%i", iii, iii+1, jjj);
-			TH1F * eHist_0 = new TH1F( tagLow, titleLow, bins, 0, 5);
-			TH1F * gHist_0 = new TH1F( tagHigh, titleHigh, bins, 0, 5);
-			Histse_0.push_back(eHist_0);
-			Histsg_0.push_back(gHist_0);
-			if(iii != 4) count++;
-		}//end for jjj
-		Histogramse_0.push_back(Histse_0);
-		Histogramsg_0.push_back(Histsg_0);
-		Histse_0.clear();
-		Histsg_0.clear();
-	}//end for iii
+    int count = 1;
+    int bins = 125600;
+    //create the necessary histograms
+    for(int iii = 0; iii < numEtaBins; iii++){
+        double etaMax = ((double)iii+1)*(2.5/(double)numEtaBins);
+        double etaMin = (double)iii * 2.5/(double)numEtaBins;
+        double apd = 1;
+        for(int jjj = 0; jjj < 100; jjj++){
+            if( jjj > 0 ) apd -= 0.01;
+            sprintf( titleLow, "e R9_0, %lf < |#eta| < %lf, APD/PN = %lf", etaMin, etaMax, apd);
+            sprintf( titleHigh, "g R9_0, %lf < |#eta| < %lf, APD/PN = %lf", etaMin, etaMax, apd);
+            sprintf( tagLow, "e_0_%i_%i_%i", iii, iii+1, jjj);
+            sprintf( tagHigh, "g_0_%i_%i_%i", iii, iii+1, jjj);
+            TH1F * eHist_0 = new TH1F( tagLow, titleLow, bins, 0, 5);
+            TH1F * gHist_0 = new TH1F( tagHigh, titleHigh, bins, 0, 5);
+            Histse_0.push_back(eHist_0);
+            Histsg_0.push_back(gHist_0);
+            if(iii != 4) count++;
+        }//end for jjj
+        Histogramse_0.push_back(Histse_0);
+        Histogramsg_0.push_back(Histsg_0);
+        Histse_0.clear();
+        Histsg_0.clear();
+    }//end for iii
 
-	//tree members
-	float R9 [2];
-	float full5x5_R9 [2];
-	float energyR [2];
-	float eta [2];
-	float etaSC [2];
-	float phi [2];
-	float energyG [2];
-	float etaS [2];
-	float phiS [2];
-	float rawSuperClusterEnergy [2];
-	float def_nomiRecHitSum [2];
-	double apd_lce_RecHitSums1 [100];
-	double apd_lce_RecHitSums2 [100];
-	double linearEnergies1 [8];
-	double linearEnergies2 [8];
-	float dr [2];
-	float seedCrystalRatio [2];
-	int showerMaxBin [2];
-	float supClustCrystals [2];
-	Long64_t run, event, lum;
+    //tree members
+    float R9 [2];
+    float full5x5_R9 [2];
+    float energyR [2];
+    float eta [2];
+    float etaSC [2];
+    float phi [2];
+    float energyG [2];
+    float etaS [2];
+    float phiS [2];
+    float rawSuperClusterEnergy [2];
+    float def_nomiRecHitSum [2];
+    double apd_lce_RecHitSums1 [100];
+    double apd_lce_RecHitSums2 [100];
+    double linearEnergies1 [8];
+    double linearEnergies2 [8];
+    float dr [2];
+    float seedCrystalRatio [2];
+    int showerMaxBin [2];
+    float supClustCrystals [2];
+    Long64_t run, event, lum;
 
-	//File stuffs
+    //File stuffs
     std::ifstream in;
-	in.open( ele_file.c_str() );
+    in.open( ele_file.c_str() );
 
     std::string rootFile;
-	bool noVeto = true;
-	// by my own convention this loop will be the electron loop
+    bool noVeto = true;
+    // by my own convention this loop will be the electron loop
     while( in >> rootFile){
         TFile * myFile = TFile::Open(rootFile.c_str());
         if(!(myFile->IsZombie())){
@@ -762,21 +821,21 @@ void myHistogramProducer::produce_PION_Histograms( std::string ele_file, std::st
                             //determine which eta bin the first electron falls into
                             int etaIndex1 = fabs(etaSC[0])/(2.5/(double)numEtaBins);
                             int etaIndex2 = fabs(etaSC[1])/(2.5/(double)numEtaBins);;
-                        for(int i = 0; i < numEtaBins - 1 ; i++){
-                            if( fabs(etaSC[0]) > etaBins[i] && fabs(etaSC[0]) < etaBins[i+1]){
-                                etaIndex1 = i;
+                            for(int i = 0; i < numEtaBins - 1 ; i++){
+                                if( fabs(etaSC[0]) > etaBins[i] && fabs(etaSC[0]) < etaBins[i+1]){
+                                    etaIndex1 = i;
+                                }
+                                if( fabs(etaSC[1]) > etaBins[i] && fabs(etaSC[1]) < etaBins[i+1]){
+                                    etaIndex2 = i;
+                                }
                             }
-                            if( fabs(etaSC[1]) > etaBins[i] && fabs(etaSC[1]) < etaBins[i+1]){
-                                etaIndex2 = i;
-                            }
-                        }
                             if( etaIndex1 < numEtaBins && full5x5_R9[0] > 0.94){
                                 //make 2D plots for R9 bins:::
                                 for(int i = 0; i < 100; i++){
                                     Histogramse_0[etaIndex1][i]->Fill(apd_lce_RecHitSums1[i]/def_nomiRecHitSum[0]);
                                 }//end for apd bins
                             }
-                                if( etaIndex2 < numEtaBins && full5x5_R9[1] > 0.94){
+                            if( etaIndex2 < numEtaBins && full5x5_R9[1] > 0.94){
                                 for(int i = 0; i < 100; i++){
                                     Histogramse_0[etaIndex2][i]->Fill(apd_lce_RecHitSums2[i]/def_nomiRecHitSum[1]);
                                 }//end for apd bins
@@ -796,11 +855,11 @@ void myHistogramProducer::produce_PION_Histograms( std::string ele_file, std::st
         }
         myFile->Close();
     }//end while files in
-	
-	in.close();
-	in.open( pi_file.c_str() );
 
-	// this loop will be the photon loop
+    in.close();
+    in.open( pi_file.c_str() );
+
+    // this loop will be the photon loop
     while( in >> rootFile){
         TFile * myFile = TFile::Open(rootFile.c_str());
         if(!(myFile->IsZombie())){
@@ -867,18 +926,18 @@ void myHistogramProducer::produce_PION_Histograms( std::string ele_file, std::st
         }
         myFile->Close();
     }//end while files in
-	
-	in.close();
+
+    in.close();
 
     // manage output directory
     //
     DIRECTORY_NAME = outputDirectoryName;
-    
-    
+
+
     system(std::string("source ./clean_up_directories.sh "+DIRECTORY_NAME).c_str());
     std::cout << "source ./clean_up_directories.sh "+DIRECTORY_NAME << std::endl;
     //////////////////////////////////////////////////////
-    
+
     std::string fileOut = DIRECTORY_NAME+outputFileName;
     if(fileOut.find(".root") == std::string::npos) fileOut = fileOut+".root";
 
@@ -886,7 +945,7 @@ void myHistogramProducer::produce_PION_Histograms( std::string ele_file, std::st
     std::cout<< "files successfully analyzed... " << std::endl;
     std::cout<< "begin writing to file `"<< fileOut << "' ..." << std::endl;
 
-	//////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
 
 	TFile * out = new TFile(fileOut.c_str(), "RECREATE");
 	out->cd();

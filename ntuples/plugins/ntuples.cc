@@ -438,6 +438,7 @@ ntuples::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 R9[i]                         = (*photonHandle)[index[i]].r9();
                 full5x5_R9[i]                 = (*photonHandle)[index[i]].full5x5_r9();
                 showerMaxBin[i]               = myFramework.getShowerMax((*photonHandle)[index[i]], *thisPCaloHitsHandle);
+                std::cout << R9[i] << " " << full5x5_R9[i] << std::endl;
             }// end if index[0]
         }//end for photons
     }//end if photons

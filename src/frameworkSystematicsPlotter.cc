@@ -34,6 +34,8 @@
 
 //#define ETA_VETO
 //#define ALT_R9
+//#define ALT_ETA
+//#define COVERING_INFO
 
 extern std::string DIRECTORY_NAME;
 extern bool _flag_crossChecks;
@@ -53,6 +55,7 @@ int laserResponseBins_2018 [7] = {89, 89, 87, 86, 74, 60, 39};
 double etaBins_center[7] = {0.15, 0.5, 0.9, 1.2721, 1.687, 1.95, 2.3};
 
 void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool corrections){
+    std::cout << corrections << std::endl;
 #ifdef ALT_R9
 	int numR9bins = 6;
 	double r9Bins[7] = {0, 0.8, 0.9, 0.92, 0.94, 0.96, 1.00}; 
@@ -61,8 +64,13 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
-	int numEtaBins = 8;
-	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#ifdef ALT_ETA
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.4, 2.5};
+#else
+    int numEtaBins = 8;
+    double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
 
     std::string energy = "";
     float _fEnergy = 0.;
@@ -85,6 +93,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 
     //begin making the necessary histograms
     std::vector< std::vector<TH1F*> > systematics;
+    std::vector< std::vector<TH1F*> > covering;
     std::vector< std::vector<TH1F*> > energy_pho;
     std::vector< std::vector<TH1F*> > energy_ele;
     std::vector< std::vector<TH1F*> > events_pho;
@@ -92,6 +101,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     std::vector< std::vector<TH1F*> > rms_pho;
     std::vector< std::vector<TH1F*> > rms_ele;
     std::vector< TH1F* > temp_;
+    std::vector< TH1F* > tmep_;
     std::vector< TH1F* > temp1_;
     std::vector< TH1F* > temp2_;
     std::vector< TH1F* > temp3_;
@@ -103,6 +113,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
         for(int j = 0; j < numEtaBins; j++){
             sprintf(title, "Systematics_%i_%i", i, j);
             temp_.push_back(new TH1F(title, title, numEtaBins, etaBins));
+            sprintf(title, "covering_%i_%i", i, j);
+            tmep_.push_back(new TH1F(title, title, numEtaBins, etaBins));
             sprintf(title, "Energy_Pho_%i_%i", i, j);
             temp1_.push_back(new TH1F(title, title, numEtaBins, etaBins));
             sprintf(title, "Energy_Ele_%i_%i", i, j);
@@ -117,6 +129,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
             temp6_.push_back(new TH1F(title, title, numEtaBins, etaBins));
         }
         systematics.push_back(temp_);
+        covering.push_back(tmep_);
         energy_pho.push_back(temp1_);
         energy_ele.push_back(temp2_);
         events_pho.push_back(temp3_);
@@ -124,6 +137,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
         rms_pho.push_back(temp5_);
         rms_ele.push_back(temp6_);
         temp_.clear();
+        tmep_.clear();
         temp1_.clear();
         temp2_.clear();
         temp3_.clear();
@@ -304,6 +318,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     double correction;
     double median = 0.5;
     for(int eta = 0; eta < numEtaBins; eta++){
+        int temp_eta = eta;
+        if(eta == 8) temp_eta = 7;
         if(eta != 4){
             for(int apd = 35; apd < 99; apd++){
                 if(_flag_crossChecks){
@@ -380,8 +396,10 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                     g_4_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, x5);
                 }
 
-                double correction_norm = std::max( fabs(low_ratio_0->GetBinContent(eta+1, apd+1)), fabs(high_ratio_0->GetBinContent(eta+1, apd+1)));
-                double correction_front = fabs(front_ratio_0->GetBinContent(eta+1, apd+1));
+
+                //double correction_norm = std::max( fabs(low_ratio_0->GetBinContent(temp_eta+1, apd+1)), fabs(high_ratio_0->GetBinContent(temp_eta+1, apd+1)));
+                double correction_norm = fabs(high_ratio_0->GetBinContent(temp_eta+1, apd+1));
+                double correction_front = fabs(front_ratio_0->GetBinContent(temp_eta+1, apd+1));
                 if(_flag_median){
                     e_0_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
                     g_0_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
@@ -393,13 +411,17 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 error1 = e_0_hists[eta][99-apd]->GetRMS()/sqrt(e_0_hists[eta][99-apd]->GetEntries());
                 error2 = g_0_hists[eta][99-apd]->GetRMS()/sqrt(g_0_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
+#ifdef COVERING_INFO
+                std::cout << "[INFO] covering systematic for (eta, r9, lr) = ( " << eta << ", 0, " << 99-apd<< ") is " << correction << std::endl;
+#endif
+                covering[apd][0]->SetBinContent(eta+1, correction);
                 if(corrections){
                     systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*correction);
                     systematics[apd][0]->SetBinError(eta + 1, 100*(mean2/mean1)*correction*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));
                 }
                 else{
                     systematics[apd][0]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1));
-                    systematics[apd][0]->SetBinError(eta + 1, 100*(mean2/mean1)*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));\
+                    systematics[apd][0]->SetBinError(eta + 1, 100*(mean2/mean1)*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));
                 }
                 energy_pho[apd][0]->SetBinContent(eta+1, mean2);
                 energy_pho[apd][0]->SetBinError(eta+1, error2);
@@ -410,8 +432,10 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 rms_pho[apd][0]->SetBinContent(eta+1, g_0_hists[eta][99-apd]->GetRMS());
                 rms_ele[apd][0]->SetBinContent(eta+1, e_0_hists[eta][99-apd]->GetRMS());
 
-                correction_norm = std::max( fabs(low_ratio_1->GetBinContent(eta+1, apd+1)), fabs(high_ratio_1->GetBinContent(eta+1, apd+1)));
-                correction_front = fabs(front_ratio_1->GetBinContent(eta+1, apd+1));
+
+                //correction_norm = std::max( fabs(low_ratio_1->GetBinContent(temp_eta+1, apd+1)), fabs(high_ratio_1->GetBinContent(temp_eta+1, apd+1)));
+                correction_norm = fabs(high_ratio_1->GetBinContent(temp_eta+1, apd+1));
+                correction_front = fabs(front_ratio_1->GetBinContent(temp_eta+1, apd+1));
                 if(_flag_median){
                     e_1_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
                     g_1_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
@@ -425,6 +449,10 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 error1 = e_1_hists[eta][99-apd]->GetRMS()/sqrt(e_1_hists[eta][99-apd]->GetEntries());
                 error2 = g_1_hists[eta][99-apd]->GetRMS()/sqrt(g_1_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
+#ifdef COVERING_INFO
+                std::cout << "[INFO] covering systematic for (eta, r9, lr) = ( " << eta << ", 1, " << 99-apd<< ") is " << correction << std::endl;
+#endif
+                covering[apd][1]->SetBinContent(eta+1, correction);
                 if(corrections){
                     systematics[apd][1]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*correction);
                     systematics[apd][1]->SetBinError(eta + 1, 100*(mean2/mean1)*correction*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));
@@ -442,8 +470,9 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 rms_pho[apd][1]->SetBinContent(eta+1, g_1_hists[eta][99-apd]->GetRMS());
                 rms_ele[apd][1]->SetBinContent(eta+1, e_1_hists[eta][99-apd]->GetRMS());
 
-                correction_norm = std::max( fabs(low_ratio_2->GetBinContent(eta+1, apd+1)), fabs(high_ratio_2->GetBinContent(eta+1, apd+1)));
-                correction_front = fabs(front_ratio_2->GetBinContent(eta+1, apd+1));
+                //correction_norm = std::max( fabs(low_ratio_2->GetBinContent(temp_eta+1, apd+1)), fabs(high_ratio_2->GetBinContent(temp_eta+1, apd+1)));
+                correction_norm = fabs(high_ratio_2->GetBinContent(temp_eta+1, apd+1));
+                correction_front = fabs(front_ratio_2->GetBinContent(temp_eta+1, apd+1));
                 if(_flag_median){
                     e_2_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
                     g_2_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
@@ -457,6 +486,10 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 error1 = e_2_hists[eta][99-apd]->GetRMS()/sqrt(e_2_hists[eta][99-apd]->GetEntries());
                 error2 = g_2_hists[eta][99-apd]->GetRMS()/sqrt(g_2_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
+#ifdef COVERING_INFO
+                std::cout << "[INFO] covering systematic for (eta, r9, lr) = ( " << eta << ", 2, " << 99-apd<< ") is " << correction << std::endl;
+#endif
+                covering[apd][2]->SetBinContent(eta+1, correction);
                 if(corrections){
                     systematics[apd][2]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*correction);
                     systematics[apd][2]->SetBinError(eta + 1, 100*(mean2/mean1)*correction*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));
@@ -474,8 +507,9 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 rms_pho[apd][2]->SetBinContent(eta+1, g_2_hists[eta][99-apd]->GetRMS());
                 rms_ele[apd][2]->SetBinContent(eta+1, e_2_hists[eta][99-apd]->GetRMS());
 
-                correction_norm = std::max( fabs(low_ratio_3->GetBinContent(eta+1, apd+1)), fabs(high_ratio_3->GetBinContent(eta+1, apd+1)));
-                correction_front = fabs(front_ratio_3->GetBinContent(eta+1, apd+1));
+                //correction_norm = std::max( fabs(low_ratio_3->GetBinContent(temp_eta+1, apd+1)), fabs(high_ratio_3->GetBinContent(temp_eta+1, apd+1)));
+                correction_norm = fabs(high_ratio_3->GetBinContent(temp_eta+1, apd+1));
+                correction_front = fabs(front_ratio_3->GetBinContent(temp_eta+1, apd+1));
                 if(_flag_median){
                     e_3_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
                     g_3_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
@@ -489,6 +523,10 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 error1 = e_3_hists[eta][99-apd]->GetRMS()/sqrt(e_3_hists[eta][99-apd]->GetEntries());
                 error2 = g_3_hists[eta][99-apd]->GetRMS()/sqrt(g_3_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
+#ifdef COVERING_INFO
+                std::cout << "[INFO] covering systematic for (eta, r9, lr) = ( " << eta << ", 3, " << 99-apd<< ") is " << correction << std::endl;
+#endif
+                covering[apd][3]->SetBinContent(eta+1, correction);
                 if(corrections){
                     systematics[apd][3]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*correction);
                     systematics[apd][3]->SetBinError(eta + 1, 100*(mean2/mean1)*correction*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));
@@ -506,8 +544,9 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 rms_pho[apd][3]->SetBinContent(eta+1, g_3_hists[eta][99-apd]->GetRMS());
                 rms_ele[apd][3]->SetBinContent(eta+1, e_3_hists[eta][99-apd]->GetRMS());
 
-                correction_norm = std::max( fabs(low_ratio_4->GetBinContent(eta+1, apd+1)), fabs(high_ratio_4->GetBinContent(eta+1, apd+1)));
-                correction_front = fabs(front_ratio_4->GetBinContent(eta+1, apd+1));
+                //correction_norm = std::max( fabs(low_ratio_4->GetBinContent(temp_eta+1, apd+1)), fabs(high_ratio_4->GetBinContent(temp_eta+1, apd+1)));
+                correction_norm = fabs(high_ratio_4->GetBinContent(temp_eta+1, apd+1));
+                correction_front = fabs(front_ratio_4->GetBinContent(temp_eta+1, apd+1));
                 if(_flag_median){
                     e_4_hists[eta][99-apd]->GetQuantiles(1, &mean1, &median); 
                     g_4_hists[eta][99-apd]->GetQuantiles(1, &mean2, &median); 
@@ -519,6 +558,10 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 error1 = e_4_hists[eta][99-apd]->GetRMS()/sqrt(e_4_hists[eta][99-apd]->GetEntries());
                 error2 = g_4_hists[eta][99-apd]->GetRMS()/sqrt(g_4_hists[eta][99-apd]->GetEntries());
                 correction = (1 + (correction_front/100.) + (correction_norm/100.));
+#ifdef COVERING_INFO
+                std::cout << "[INFO] covering systematic for (eta, r9, lr) = ( " << eta << ", 4, " << 99-apd<< ") is " << correction << std::endl;
+#endif
+                covering[apd][4]->SetBinContent(eta+1, correction);
                 if(corrections){
                     systematics[apd][4]->SetBinContent(eta + 1, 100*((mean2/mean1) - 1)*correction);
                     systematics[apd][4]->SetBinError(eta + 1, 100*(mean2/mean1)*correction*sqrt(pow(error1/mean1, 2) + pow(error2/mean2, 2)));
@@ -536,8 +579,8 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
                 rms_pho[apd][4]->SetBinContent(eta+1, g_4_hists[eta][99-apd]->GetRMS());
                 rms_ele[apd][4]->SetBinContent(eta+1, e_4_hists[eta][99-apd]->GetRMS());
 #ifdef ALT_R9
-                correction_norm = std::max( fabs(low_ratio_5->GetBinContent(eta+1, apd+1)), fabs(high_ratio_5->GetBinContent(eta+1, apd+1)));
-                correction_front = fabs(front_ratio_5->GetBinContent(eta+1, apd+1));
+                correction_norm = std::max( fabs(low_ratio_5->GetBinContent(temp_eta+1, apd+1)), fabs(high_ratio_5->GetBinContent(temp_eta+1, apd+1)));
+                correction_front = fabs(front_ratio_5->GetBinContent(temp_eta+1, apd+1));
                 if(_flag_truncate){
                     e_5_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
                     g_5_hists[eta][99-apd]->GetXaxis()->SetRangeUser(1, 1.05);
@@ -568,125 +611,125 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
         }
     }
 
-    TH1F * systematics2016_0 = new TH1F("systematics2016_0", "systematics2016_0", 8, etaBins);
-    TH1F * systematics2016_1 = new TH1F("systematics2016_1", "systematics2016_1", 8, etaBins);
-    TH1F * systematics2016_2 = new TH1F("systematics2016_2", "systematics2016_2", 8, etaBins);
-    TH1F * systematics2016_3 = new TH1F("systematics2016_3", "systematics2016_3", 8, etaBins);
-    TH1F * systematics2016_4 = new TH1F("systematics2016_4", "systematics2016_4", 8, etaBins);
+    TH1F * systematics2016_0 = new TH1F("systematics2016_0", "systematics2016_0", numEtaBins, etaBins);
+    TH1F * systematics2016_1 = new TH1F("systematics2016_1", "systematics2016_1", numEtaBins, etaBins);
+    TH1F * systematics2016_2 = new TH1F("systematics2016_2", "systematics2016_2", numEtaBins, etaBins);
+    TH1F * systematics2016_3 = new TH1F("systematics2016_3", "systematics2016_3", numEtaBins, etaBins);
+    TH1F * systematics2016_4 = new TH1F("systematics2016_4", "systematics2016_4", numEtaBins, etaBins);
 
-    TH1F * systematics2017_0 = new TH1F("systematics2017_0", "systematics2017_0", 8, etaBins);
-    TH1F * systematics2017_1 = new TH1F("systematics2017_1", "systematics2017_1", 8, etaBins);
-    TH1F * systematics2017_2 = new TH1F("systematics2017_2", "systematics2017_2", 8, etaBins);
-    TH1F * systematics2017_3 = new TH1F("systematics2017_3", "systematics2017_3", 8, etaBins);
-    TH1F * systematics2017_4 = new TH1F("systematics2017_4", "systematics2017_4", 8, etaBins);
+    TH1F * systematics2017_0 = new TH1F("systematics2017_0", "systematics2017_0", numEtaBins, etaBins);
+    TH1F * systematics2017_1 = new TH1F("systematics2017_1", "systematics2017_1", numEtaBins, etaBins);
+    TH1F * systematics2017_2 = new TH1F("systematics2017_2", "systematics2017_2", numEtaBins, etaBins);
+    TH1F * systematics2017_3 = new TH1F("systematics2017_3", "systematics2017_3", numEtaBins, etaBins);
+    TH1F * systematics2017_4 = new TH1F("systematics2017_4", "systematics2017_4", numEtaBins, etaBins);
 
-    TH1F * systematics2018_0 = new TH1F("systematics2018_0", "systematics2018_0", 8, etaBins);
-    TH1F * systematics2018_1 = new TH1F("systematics2018_1", "systematics2018_1", 8, etaBins);
-    TH1F * systematics2018_2 = new TH1F("systematics2018_2", "systematics2018_2", 8, etaBins);
-    TH1F * systematics2018_3 = new TH1F("systematics2018_3", "systematics2018_3", 8, etaBins);
-    TH1F * systematics2018_4 = new TH1F("systematics2018_4", "systematics2018_4", 8, etaBins);
+    TH1F * systematics2018_0 = new TH1F("systematics2018_0", "systematics2018_0", numEtaBins, etaBins);
+    TH1F * systematics2018_1 = new TH1F("systematics2018_1", "systematics2018_1", numEtaBins, etaBins);
+    TH1F * systematics2018_2 = new TH1F("systematics2018_2", "systematics2018_2", numEtaBins, etaBins);
+    TH1F * systematics2018_3 = new TH1F("systematics2018_3", "systematics2018_3", numEtaBins, etaBins);
+    TH1F * systematics2018_4 = new TH1F("systematics2018_4", "systematics2018_4", numEtaBins, etaBins);
 
-    TH1F * energy_pho2016_0 = new TH1F("energy_pho2016_0", "energy_pho2016_0", 8, etaBins);
-    TH1F * energy_pho2016_1 = new TH1F("energy_pho2016_1", "energy_pho2016_1", 8, etaBins);
-    TH1F * energy_pho2016_2 = new TH1F("energy_pho2016_2", "energy_pho2016_2", 8, etaBins);
-    TH1F * energy_pho2016_3 = new TH1F("energy_pho2016_3", "energy_pho2016_3", 8, etaBins);
-    TH1F * energy_pho2016_4 = new TH1F("energy_pho2016_4", "energy_pho2016_4", 8, etaBins);
+    TH1F * energy_pho2016_0 = new TH1F("energy_pho2016_0", "energy_pho2016_0", numEtaBins, etaBins);
+    TH1F * energy_pho2016_1 = new TH1F("energy_pho2016_1", "energy_pho2016_1", numEtaBins, etaBins);
+    TH1F * energy_pho2016_2 = new TH1F("energy_pho2016_2", "energy_pho2016_2", numEtaBins, etaBins);
+    TH1F * energy_pho2016_3 = new TH1F("energy_pho2016_3", "energy_pho2016_3", numEtaBins, etaBins);
+    TH1F * energy_pho2016_4 = new TH1F("energy_pho2016_4", "energy_pho2016_4", numEtaBins, etaBins);
 
-    TH1F * energy_pho2017_0 = new TH1F("energy_pho2017_0", "energy_pho2017_0", 8, etaBins);
-    TH1F * energy_pho2017_1 = new TH1F("energy_pho2017_1", "energy_pho2017_1", 8, etaBins);
-    TH1F * energy_pho2017_2 = new TH1F("energy_pho2017_2", "energy_pho2017_2", 8, etaBins);
-    TH1F * energy_pho2017_3 = new TH1F("energy_pho2017_3", "energy_pho2017_3", 8, etaBins);
-    TH1F * energy_pho2017_4 = new TH1F("energy_pho2017_4", "energy_pho2017_4", 8, etaBins);
+    TH1F * energy_pho2017_0 = new TH1F("energy_pho2017_0", "energy_pho2017_0", numEtaBins, etaBins);
+    TH1F * energy_pho2017_1 = new TH1F("energy_pho2017_1", "energy_pho2017_1", numEtaBins, etaBins);
+    TH1F * energy_pho2017_2 = new TH1F("energy_pho2017_2", "energy_pho2017_2", numEtaBins, etaBins);
+    TH1F * energy_pho2017_3 = new TH1F("energy_pho2017_3", "energy_pho2017_3", numEtaBins, etaBins);
+    TH1F * energy_pho2017_4 = new TH1F("energy_pho2017_4", "energy_pho2017_4", numEtaBins, etaBins);
 
-    TH1F * energy_pho2018_0 = new TH1F("energy_pho2018_0", "energy_pho2018_0", 8, etaBins);
-    TH1F * energy_pho2018_1 = new TH1F("energy_pho2018_1", "energy_pho2018_1", 8, etaBins);
-    TH1F * energy_pho2018_2 = new TH1F("energy_pho2018_2", "energy_pho2018_2", 8, etaBins);
-    TH1F * energy_pho2018_3 = new TH1F("energy_pho2018_3", "energy_pho2018_3", 8, etaBins);
-    TH1F * energy_pho2018_4 = new TH1F("energy_pho2018_4", "energy_pho2018_4", 8, etaBins);
+    TH1F * energy_pho2018_0 = new TH1F("energy_pho2018_0", "energy_pho2018_0", numEtaBins, etaBins);
+    TH1F * energy_pho2018_1 = new TH1F("energy_pho2018_1", "energy_pho2018_1", numEtaBins, etaBins);
+    TH1F * energy_pho2018_2 = new TH1F("energy_pho2018_2", "energy_pho2018_2", numEtaBins, etaBins);
+    TH1F * energy_pho2018_3 = new TH1F("energy_pho2018_3", "energy_pho2018_3", numEtaBins, etaBins);
+    TH1F * energy_pho2018_4 = new TH1F("energy_pho2018_4", "energy_pho2018_4", numEtaBins, etaBins);
 
-    TH1F * energy_ele2016_0 = new TH1F("energy_ele2016_0", "energy_ele2016_0", 8, etaBins);
-    TH1F * energy_ele2016_1 = new TH1F("energy_ele2016_1", "energy_ele2016_1", 8, etaBins);
-    TH1F * energy_ele2016_2 = new TH1F("energy_ele2016_2", "energy_ele2016_2", 8, etaBins);
-    TH1F * energy_ele2016_3 = new TH1F("energy_ele2016_3", "energy_ele2016_3", 8, etaBins);
-    TH1F * energy_ele2016_4 = new TH1F("energy_ele2016_4", "energy_ele2016_4", 8, etaBins);
+    TH1F * energy_ele2016_0 = new TH1F("energy_ele2016_0", "energy_ele2016_0", numEtaBins, etaBins);
+    TH1F * energy_ele2016_1 = new TH1F("energy_ele2016_1", "energy_ele2016_1", numEtaBins, etaBins);
+    TH1F * energy_ele2016_2 = new TH1F("energy_ele2016_2", "energy_ele2016_2", numEtaBins, etaBins);
+    TH1F * energy_ele2016_3 = new TH1F("energy_ele2016_3", "energy_ele2016_3", numEtaBins, etaBins);
+    TH1F * energy_ele2016_4 = new TH1F("energy_ele2016_4", "energy_ele2016_4", numEtaBins, etaBins);
 
-    TH1F * energy_ele2017_0 = new TH1F("energy_ele2017_0", "energy_ele2017_0", 8, etaBins);
-    TH1F * energy_ele2017_1 = new TH1F("energy_ele2017_1", "energy_ele2017_1", 8, etaBins);
-    TH1F * energy_ele2017_2 = new TH1F("energy_ele2017_2", "energy_ele2017_2", 8, etaBins);
-    TH1F * energy_ele2017_3 = new TH1F("energy_ele2017_3", "energy_ele2017_3", 8, etaBins);
-    TH1F * energy_ele2017_4 = new TH1F("energy_ele2017_4", "energy_ele2017_4", 8, etaBins);
+    TH1F * energy_ele2017_0 = new TH1F("energy_ele2017_0", "energy_ele2017_0", numEtaBins, etaBins);
+    TH1F * energy_ele2017_1 = new TH1F("energy_ele2017_1", "energy_ele2017_1", numEtaBins, etaBins);
+    TH1F * energy_ele2017_2 = new TH1F("energy_ele2017_2", "energy_ele2017_2", numEtaBins, etaBins);
+    TH1F * energy_ele2017_3 = new TH1F("energy_ele2017_3", "energy_ele2017_3", numEtaBins, etaBins);
+    TH1F * energy_ele2017_4 = new TH1F("energy_ele2017_4", "energy_ele2017_4", numEtaBins, etaBins);
 
-    TH1F * energy_ele2018_0 = new TH1F("energy_ele2018_0", "energy_ele2018_0", 8, etaBins);
-    TH1F * energy_ele2018_1 = new TH1F("energy_ele2018_1", "energy_ele2018_1", 8, etaBins);
-    TH1F * energy_ele2018_2 = new TH1F("energy_ele2018_2", "energy_ele2018_2", 8, etaBins);
-    TH1F * energy_ele2018_3 = new TH1F("energy_ele2018_3", "energy_ele2018_3", 8, etaBins);
-    TH1F * energy_ele2018_4 = new TH1F("energy_ele2018_4", "energy_ele2018_4", 8, etaBins);
+    TH1F * energy_ele2018_0 = new TH1F("energy_ele2018_0", "energy_ele2018_0", numEtaBins, etaBins);
+    TH1F * energy_ele2018_1 = new TH1F("energy_ele2018_1", "energy_ele2018_1", numEtaBins, etaBins);
+    TH1F * energy_ele2018_2 = new TH1F("energy_ele2018_2", "energy_ele2018_2", numEtaBins, etaBins);
+    TH1F * energy_ele2018_3 = new TH1F("energy_ele2018_3", "energy_ele2018_3", numEtaBins, etaBins);
+    TH1F * energy_ele2018_4 = new TH1F("energy_ele2018_4", "energy_ele2018_4", numEtaBins, etaBins);
 
-    TH1F * events_pho2016_0 = new TH1F("events_pho2016_0", "events_pho2016_0", 8, etaBins);
-    TH1F * events_pho2016_1 = new TH1F("events_pho2016_1", "events_pho2016_1", 8, etaBins);
-    TH1F * events_pho2016_2 = new TH1F("events_pho2016_2", "events_pho2016_2", 8, etaBins);
-    TH1F * events_pho2016_3 = new TH1F("events_pho2016_3", "events_pho2016_3", 8, etaBins);
-    TH1F * events_pho2016_4 = new TH1F("events_pho2016_4", "events_pho2016_4", 8, etaBins);
+    TH1F * events_pho2016_0 = new TH1F("events_pho2016_0", "events_pho2016_0", numEtaBins, etaBins);
+    TH1F * events_pho2016_1 = new TH1F("events_pho2016_1", "events_pho2016_1", numEtaBins, etaBins);
+    TH1F * events_pho2016_2 = new TH1F("events_pho2016_2", "events_pho2016_2", numEtaBins, etaBins);
+    TH1F * events_pho2016_3 = new TH1F("events_pho2016_3", "events_pho2016_3", numEtaBins, etaBins);
+    TH1F * events_pho2016_4 = new TH1F("events_pho2016_4", "events_pho2016_4", numEtaBins, etaBins);
 
-    TH1F * events_ele2016_0 = new TH1F("events_ele2016_0", "events_ele2016_0", 8, etaBins);
-    TH1F * events_ele2016_1 = new TH1F("events_ele2016_1", "events_ele2016_1", 8, etaBins);
-    TH1F * events_ele2016_2 = new TH1F("events_ele2016_2", "events_ele2016_2", 8, etaBins);
-    TH1F * events_ele2016_3 = new TH1F("events_ele2016_3", "events_ele2016_3", 8, etaBins);
-    TH1F * events_ele2016_4 = new TH1F("events_ele2016_4", "events_ele2016_4", 8, etaBins);
+    TH1F * events_ele2016_0 = new TH1F("events_ele2016_0", "events_ele2016_0", numEtaBins, etaBins);
+    TH1F * events_ele2016_1 = new TH1F("events_ele2016_1", "events_ele2016_1", numEtaBins, etaBins);
+    TH1F * events_ele2016_2 = new TH1F("events_ele2016_2", "events_ele2016_2", numEtaBins, etaBins);
+    TH1F * events_ele2016_3 = new TH1F("events_ele2016_3", "events_ele2016_3", numEtaBins, etaBins);
+    TH1F * events_ele2016_4 = new TH1F("events_ele2016_4", "events_ele2016_4", numEtaBins, etaBins);
 
-    TH1F * rms_pho2016_0 = new TH1F("rms_pho2016_0", "rms_pho2016_0", 8, etaBins);
-    TH1F * rms_pho2016_1 = new TH1F("rms_pho2016_1", "rms_pho2016_1", 8, etaBins);
-    TH1F * rms_pho2016_2 = new TH1F("rms_pho2016_2", "rms_pho2016_2", 8, etaBins);
-    TH1F * rms_pho2016_3 = new TH1F("rms_pho2016_3", "rms_pho2016_3", 8, etaBins);
-    TH1F * rms_pho2016_4 = new TH1F("rms_pho2016_4", "rms_pho2016_4", 8, etaBins);
+    TH1F * rms_pho2016_0 = new TH1F("rms_pho2016_0", "rms_pho2016_0", numEtaBins, etaBins);
+    TH1F * rms_pho2016_1 = new TH1F("rms_pho2016_1", "rms_pho2016_1", numEtaBins, etaBins);
+    TH1F * rms_pho2016_2 = new TH1F("rms_pho2016_2", "rms_pho2016_2", numEtaBins, etaBins);
+    TH1F * rms_pho2016_3 = new TH1F("rms_pho2016_3", "rms_pho2016_3", numEtaBins, etaBins);
+    TH1F * rms_pho2016_4 = new TH1F("rms_pho2016_4", "rms_pho2016_4", numEtaBins, etaBins);
 
-    TH1F * rms_ele2016_0 = new TH1F("rms_ele2016_0", "rms_ele2016_0", 8, etaBins);
-    TH1F * rms_ele2016_1 = new TH1F("rms_ele2016_1", "rms_ele2016_1", 8, etaBins);
-    TH1F * rms_ele2016_2 = new TH1F("rms_ele2016_2", "rms_ele2016_2", 8, etaBins);
-    TH1F * rms_ele2016_3 = new TH1F("rms_ele2016_3", "rms_ele2016_3", 8, etaBins);
-    TH1F * rms_ele2016_4 = new TH1F("rms_ele2016_4", "rms_ele2016_4", 8, etaBins);
+    TH1F * rms_ele2016_0 = new TH1F("rms_ele2016_0", "rms_ele2016_0", numEtaBins, etaBins);
+    TH1F * rms_ele2016_1 = new TH1F("rms_ele2016_1", "rms_ele2016_1", numEtaBins, etaBins);
+    TH1F * rms_ele2016_2 = new TH1F("rms_ele2016_2", "rms_ele2016_2", numEtaBins, etaBins);
+    TH1F * rms_ele2016_3 = new TH1F("rms_ele2016_3", "rms_ele2016_3", numEtaBins, etaBins);
+    TH1F * rms_ele2016_4 = new TH1F("rms_ele2016_4", "rms_ele2016_4", numEtaBins, etaBins);
 
-    TH1F * rms_pho2017_0 = new TH1F("rms_pho2017_0", "rms_pho2017_0", 8, etaBins);
-    TH1F * rms_pho2017_1 = new TH1F("rms_pho2017_1", "rms_pho2017_1", 8, etaBins);
-    TH1F * rms_pho2017_2 = new TH1F("rms_pho2017_2", "rms_pho2017_2", 8, etaBins);
-    TH1F * rms_pho2017_3 = new TH1F("rms_pho2017_3", "rms_pho2017_3", 8, etaBins);
-    TH1F * rms_pho2017_4 = new TH1F("rms_pho2017_4", "rms_pho2017_4", 8, etaBins);
+    TH1F * rms_pho2017_0 = new TH1F("rms_pho2017_0", "rms_pho2017_0", numEtaBins, etaBins);
+    TH1F * rms_pho2017_1 = new TH1F("rms_pho2017_1", "rms_pho2017_1", numEtaBins, etaBins);
+    TH1F * rms_pho2017_2 = new TH1F("rms_pho2017_2", "rms_pho2017_2", numEtaBins, etaBins);
+    TH1F * rms_pho2017_3 = new TH1F("rms_pho2017_3", "rms_pho2017_3", numEtaBins, etaBins);
+    TH1F * rms_pho2017_4 = new TH1F("rms_pho2017_4", "rms_pho2017_4", numEtaBins, etaBins);
 
-    TH1F * rms_ele2017_0 = new TH1F("rms_ele2017_0", "rms_ele2017_0", 8, etaBins);
-    TH1F * rms_ele2017_1 = new TH1F("rms_ele2017_1", "rms_ele2017_1", 8, etaBins);
-    TH1F * rms_ele2017_2 = new TH1F("rms_ele2017_2", "rms_ele2017_2", 8, etaBins);
-    TH1F * rms_ele2017_3 = new TH1F("rms_ele2017_3", "rms_ele2017_3", 8, etaBins);
-    TH1F * rms_ele2017_4 = new TH1F("rms_ele2017_4", "rms_ele2017_4", 8, etaBins);
+    TH1F * rms_ele2017_0 = new TH1F("rms_ele2017_0", "rms_ele2017_0", numEtaBins, etaBins);
+    TH1F * rms_ele2017_1 = new TH1F("rms_ele2017_1", "rms_ele2017_1", numEtaBins, etaBins);
+    TH1F * rms_ele2017_2 = new TH1F("rms_ele2017_2", "rms_ele2017_2", numEtaBins, etaBins);
+    TH1F * rms_ele2017_3 = new TH1F("rms_ele2017_3", "rms_ele2017_3", numEtaBins, etaBins);
+    TH1F * rms_ele2017_4 = new TH1F("rms_ele2017_4", "rms_ele2017_4", numEtaBins, etaBins);
 
-    TH1F * rms_pho2018_0 = new TH1F("rms_pho2018_0", "rms_pho2018_0", 8, etaBins);
-    TH1F * rms_pho2018_1 = new TH1F("rms_pho2018_1", "rms_pho2018_1", 8, etaBins);
-    TH1F * rms_pho2018_2 = new TH1F("rms_pho2018_2", "rms_pho2018_2", 8, etaBins);
-    TH1F * rms_pho2018_3 = new TH1F("rms_pho2018_3", "rms_pho2018_3", 8, etaBins);
-    TH1F * rms_pho2018_4 = new TH1F("rms_pho2018_4", "rms_pho2018_4", 8, etaBins);
+    TH1F * rms_pho2018_0 = new TH1F("rms_pho2018_0", "rms_pho2018_0", numEtaBins, etaBins);
+    TH1F * rms_pho2018_1 = new TH1F("rms_pho2018_1", "rms_pho2018_1", numEtaBins, etaBins);
+    TH1F * rms_pho2018_2 = new TH1F("rms_pho2018_2", "rms_pho2018_2", numEtaBins, etaBins);
+    TH1F * rms_pho2018_3 = new TH1F("rms_pho2018_3", "rms_pho2018_3", numEtaBins, etaBins);
+    TH1F * rms_pho2018_4 = new TH1F("rms_pho2018_4", "rms_pho2018_4", numEtaBins, etaBins);
 
-    TH1F * rms_ele2018_0 = new TH1F("rms_ele2018_0", "rms_ele2018_0", 8, etaBins);
-    TH1F * rms_ele2018_1 = new TH1F("rms_ele2018_1", "rms_ele2018_1", 8, etaBins);
-    TH1F * rms_ele2018_2 = new TH1F("rms_ele2018_2", "rms_ele2018_2", 8, etaBins);
-    TH1F * rms_ele2018_3 = new TH1F("rms_ele2018_3", "rms_ele2018_3", 8, etaBins);
-    TH1F * rms_ele2018_4 = new TH1F("rms_ele2018_4", "rms_ele2018_4", 8, etaBins);
+    TH1F * rms_ele2018_0 = new TH1F("rms_ele2018_0", "rms_ele2018_0", numEtaBins, etaBins);
+    TH1F * rms_ele2018_1 = new TH1F("rms_ele2018_1", "rms_ele2018_1", numEtaBins, etaBins);
+    TH1F * rms_ele2018_2 = new TH1F("rms_ele2018_2", "rms_ele2018_2", numEtaBins, etaBins);
+    TH1F * rms_ele2018_3 = new TH1F("rms_ele2018_3", "rms_ele2018_3", numEtaBins, etaBins);
+    TH1F * rms_ele2018_4 = new TH1F("rms_ele2018_4", "rms_ele2018_4", numEtaBins, etaBins);
 #ifdef ALT_R9
-    TH1F * systematics2016_5 = new TH1F("systematics2016_5", "systematics2016_5", 8, etaBins);
-    TH1F * systematics2017_5 = new TH1F("systematics2017_5", "systematics2017_5", 8, etaBins);
-    TH1F * systematics2018_5 = new TH1F("systematics2018_5", "systematics2018_5", 8, etaBins);
-    TH1F * energy_ele2016_5 = new TH1F("energy_ele2016_5", "energy_ele2016_5", 8, etaBins);
-    TH1F * energy_ele2017_5 = new TH1F("energy_ele2017_5", "energy_ele2017_5", 8, etaBins);
-    TH1F * energy_ele2018_5 = new TH1F("energy_ele2018_5", "energy_ele2018_5", 8, etaBins);
-    TH1F * energy_pho2016_5 = new TH1F("energy_pho2016_5", "energy_pho2016_5", 8, etaBins);
-    TH1F * energy_pho2017_5 = new TH1F("energy_pho2017_5", "energy_pho2017_5", 8, etaBins);
-    TH1F * energy_pho2018_5 = new TH1F("energy_pho2018_5", "energy_pho2018_5", 8, etaBins);
-    TH1F * events_ele2016_5 = new TH1F("events_ele2016_5", "events_ele2016_5", 8, etaBins);
-    TH1F * events_pho2016_5 = new TH1F("events_pho2016_5", "events_pho2016_5", 8, etaBins);
-    TH1F * rms_ele2016_5 = new TH1F("rms_ele2016_5", "rms_ele2016_5", 8, etaBins);
-    TH1F * rms_ele2017_5 = new TH1F("rms_ele2017_5", "rms_ele2017_5", 8, etaBins);
-    TH1F * rms_ele2018_5 = new TH1F("rms_ele2018_5", "rms_ele2018_5", 8, etaBins);
-    TH1F * rms_pho2016_5 = new TH1F("rms_pho2016_5", "rms_pho2016_5", 8, etaBins);
-    TH1F * rms_pho2017_5 = new TH1F("rms_pho2017_5", "rms_pho2017_5", 8, etaBins);
-    TH1F * rms_pho2018_5 = new TH1F("rms_pho2018_5", "rms_pho2018_5", 8, etaBins);
+    TH1F * systematics2016_5 = new TH1F("systematics2016_5", "systematics2016_5", numEtaBins, etaBins);
+    TH1F * systematics2017_5 = new TH1F("systematics2017_5", "systematics2017_5", numEtaBins, etaBins);
+    TH1F * systematics2018_5 = new TH1F("systematics2018_5", "systematics2018_5", numEtaBins, etaBins);
+    TH1F * energy_ele2016_5 = new TH1F("energy_ele2016_5", "energy_ele2016_5", numEtaBins, etaBins);
+    TH1F * energy_ele2017_5 = new TH1F("energy_ele2017_5", "energy_ele2017_5", numEtaBins, etaBins);
+    TH1F * energy_ele2018_5 = new TH1F("energy_ele2018_5", "energy_ele2018_5", numEtaBins, etaBins);
+    TH1F * energy_pho2016_5 = new TH1F("energy_pho2016_5", "energy_pho2016_5", numEtaBins, etaBins);
+    TH1F * energy_pho2017_5 = new TH1F("energy_pho2017_5", "energy_pho2017_5", numEtaBins, etaBins);
+    TH1F * energy_pho2018_5 = new TH1F("energy_pho2018_5", "energy_pho2018_5", numEtaBins, etaBins);
+    TH1F * events_ele2016_5 = new TH1F("events_ele2016_5", "events_ele2016_5", numEtaBins, etaBins);
+    TH1F * events_pho2016_5 = new TH1F("events_pho2016_5", "events_pho2016_5", numEtaBins, etaBins);
+    TH1F * rms_ele2016_5 = new TH1F("rms_ele2016_5", "rms_ele2016_5", numEtaBins, etaBins);
+    TH1F * rms_ele2017_5 = new TH1F("rms_ele2017_5", "rms_ele2017_5", numEtaBins, etaBins);
+    TH1F * rms_ele2018_5 = new TH1F("rms_ele2018_5", "rms_ele2018_5", numEtaBins, etaBins);
+    TH1F * rms_pho2016_5 = new TH1F("rms_pho2016_5", "rms_pho2016_5", numEtaBins, etaBins);
+    TH1F * rms_pho2017_5 = new TH1F("rms_pho2017_5", "rms_pho2017_5", numEtaBins, etaBins);
+    TH1F * rms_pho2018_5 = new TH1F("rms_pho2018_5", "rms_pho2018_5", numEtaBins, etaBins);
 #endif
 
     for(int i = 0; i < numR9bins; i++){
@@ -694,6 +737,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
             int bin = j;
             if(j != 4){
                 if(j > 4) bin = j-1;
+                if(j == numEtaBins-1) bin = j-2;
                 switch( i ){
                     case 0:
                         systematics2016_0->SetBinContent(j+1, systematics[laserResponseBins_2016[bin]][i]->GetBinContent(j+1));
@@ -871,25 +915,25 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     std::string textFileName = fileOutPre+energy+".dat";
     out.open(textFileName.c_str(), std::ofstream::out | std::ofstream::trunc);
     //the first printed line in the text file follows and describes the binning of scheme
-    out << "#eta_center eta_low_edge eta_high_edge r9_low_edge r9_high_edge Et laser_response E_gamma_mean Pho_Events Pho_rms E_ele_mean Ele_Events ele_rms systematic uncertainty" << std::endl;
+    out << "#eta_center eta_low_edge eta_high_edge r9_low_edge r9_high_edge Et laser_response E_gamma_mean Pho_Events Pho_rms E_ele_mean Ele_Events ele_rms systematic uncertainty covering_systematics" << std::endl;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < numR9bins; j++){
-            if(j == 0) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_0->GetBinContent(i+1) << " " << events_pho2016_0->GetBinContent(i+1) << " " << rms_pho2016_0->GetBinContent(i+1) << " " << energy_ele2016_0->GetBinContent(i+1) << " " << events_ele2016_0->GetBinContent(i+1) << " " << rms_ele2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinError(i+1) << std::endl;
-            if(j == 1) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_1->GetBinContent(i+1) << " " << events_pho2016_1->GetBinContent(i+1) << " " << rms_pho2016_1->GetBinContent(i+1) << " " << energy_ele2016_1->GetBinContent(i+1) << " " << events_ele2016_1->GetBinContent(i+1) << " " << rms_ele2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinError(i+1) << std::endl;
-            if(j == 2) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_2->GetBinContent(i+1) << " " << events_pho2016_2->GetBinContent(i+1) << " " << rms_pho2016_2->GetBinContent(i+1) << " " << energy_ele2016_2->GetBinContent(i+1) << " " << events_ele2016_2->GetBinContent(i+1) << " " << rms_ele2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinError(i+1) << std::endl;
-            if(j == 3) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_3->GetBinContent(i+1) << " " << events_pho2016_3->GetBinContent(i+1) << " " << rms_pho2016_3->GetBinContent(i+1) << " " << energy_ele2016_3->GetBinContent(i+1) << " " << events_ele2016_3->GetBinContent(i+1) << " " << rms_ele2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinError(i+1) << std::endl;
-            if(j == 4) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_4->GetBinContent(i+1) << " " << events_pho2016_4->GetBinContent(i+1) << " " << rms_pho2016_4->GetBinContent(i+1) << " " << energy_ele2016_4->GetBinContent(i+1) << " " << events_ele2016_4->GetBinContent(i+1) << " " << rms_ele2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinError(i+1) << std::endl;
+            if(j == 0) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_0->GetBinContent(i+1) << " " << events_pho2016_0->GetBinContent(i+1) << " " << rms_pho2016_0->GetBinContent(i+1) << " " << energy_ele2016_0->GetBinContent(i+1) << " " << events_ele2016_0->GetBinContent(i+1) << " " << rms_ele2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
+            if(j == 1) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_1->GetBinContent(i+1) << " " << events_pho2016_1->GetBinContent(i+1) << " " << rms_pho2016_1->GetBinContent(i+1) << " " << energy_ele2016_1->GetBinContent(i+1) << " " << events_ele2016_1->GetBinContent(i+1) << " " << rms_ele2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
+            if(j == 2) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_2->GetBinContent(i+1) << " " << events_pho2016_2->GetBinContent(i+1) << " " << rms_pho2016_2->GetBinContent(i+1) << " " << energy_ele2016_2->GetBinContent(i+1) << " " << events_ele2016_2->GetBinContent(i+1) << " " << rms_ele2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
+            if(j == 3) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_3->GetBinContent(i+1) << " " << events_pho2016_3->GetBinContent(i+1) << " " << rms_pho2016_3->GetBinContent(i+1) << " " << energy_ele2016_3->GetBinContent(i+1) << " " << events_ele2016_3->GetBinContent(i+1) << " " << rms_ele2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
+            if(j == 4) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_4->GetBinContent(i+1) << " " << events_pho2016_4->GetBinContent(i+1) << " " << rms_pho2016_4->GetBinContent(i+1) << " " << energy_ele2016_4->GetBinContent(i+1) << " " << events_ele2016_4->GetBinContent(i+1) << " " << rms_ele2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][j]->GetBinContent(i+1) << std::endl;
 #ifdef ALT_R9
             if(j == 5) out << etaBins_center[i] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[j] << " " << r9Bins[j+1] << " " << _fEnergy << " " << laser_response_2016[i] << " "  << energy_pho2016_5->GetBinContent(i+1) << " " << events_pho2016_5->GetBinContent(i+1) << " " << rms_pho2016_5->GetBinContent(i+1) << " " << energy_ele2016_5->GetBinContent(i+1) << " " << events_ele2016_5->GetBinContent(i+1) << " " << rms_ele2016_5->GetBinContent(i+1) << " " << systematics2016_5->GetBinContent(i+1) << " " << systematics2016_5->GetBinError(i+1) << std::endl;
 #endif
         }
     }
-    for(int i = 5; i < 8; i++){
-        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_0->GetBinContent(i+1) << " " << events_pho2016_0->GetBinContent(i+1) << " " << rms_pho2016_0->GetBinContent(i+1) << " " << energy_ele2016_0->GetBinContent(i+1) << " " << events_ele2016_0->GetBinContent(i+1) << " " << rms_ele2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinError(i+1) << std::endl;
-        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_1->GetBinContent(i+1) << " " << events_pho2016_1->GetBinContent(i+1) << " " << rms_pho2016_1->GetBinContent(i+1) << " " << energy_ele2016_1->GetBinContent(i+1) << " " << events_ele2016_1->GetBinContent(i+1) << " " << rms_ele2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinError(i+1) << std::endl;
-        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_2->GetBinContent(i+1) << " " << events_pho2016_2->GetBinContent(i+1) << " " << rms_pho2016_2->GetBinContent(i+1) << " " << energy_ele2016_2->GetBinContent(i+1) << " " << events_ele2016_2->GetBinContent(i+1) << " " << rms_ele2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinError(i+1) << std::endl;
-        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_3->GetBinContent(i+1) << " " << events_pho2016_3->GetBinContent(i+1) << " " << rms_pho2016_3->GetBinContent(i+1) << " " << energy_ele2016_3->GetBinContent(i+1) << " " << events_ele2016_3->GetBinContent(i+1) << " " << rms_ele2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinError(i+1) << std::endl;
-        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_4->GetBinContent(i+1) << " " << events_pho2016_4->GetBinContent(i+1) << " " << rms_pho2016_4->GetBinContent(i+1) << " " << energy_ele2016_4->GetBinContent(i+1) << " " << events_ele2016_4->GetBinContent(i+1) << " " << rms_ele2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinError(i+1) << std::endl;
+    for(int i = 5; i < numEtaBins; i++){
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_0->GetBinContent(i+1) << " " << events_pho2016_0->GetBinContent(i+1) << " " << rms_pho2016_0->GetBinContent(i+1) << " " << energy_ele2016_0->GetBinContent(i+1) << " " << events_ele2016_0->GetBinContent(i+1) << " " << rms_ele2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][0]->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_1->GetBinContent(i+1) << " " << events_pho2016_1->GetBinContent(i+1) << " " << rms_pho2016_1->GetBinContent(i+1) << " " << energy_ele2016_1->GetBinContent(i+1) << " " << events_ele2016_1->GetBinContent(i+1) << " " << rms_ele2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][1]->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_2->GetBinContent(i+1) << " " << events_pho2016_2->GetBinContent(i+1) << " " << rms_pho2016_2->GetBinContent(i+1) << " " << energy_ele2016_2->GetBinContent(i+1) << " " << events_ele2016_2->GetBinContent(i+1) << " " << rms_ele2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][2]->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[3] << " " << r9Bins[3+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_3->GetBinContent(i+1) << " " << events_pho2016_3->GetBinContent(i+1) << " " << rms_pho2016_3->GetBinContent(i+1) << " " << energy_ele2016_3->GetBinContent(i+1) << " " << events_ele2016_3->GetBinContent(i+1) << " " << rms_ele2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinContent(i+1) << " " << systematics2016_3->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][3]->GetBinContent(i+1) << std::endl;
+        out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[4] << " " << r9Bins[4+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_4->GetBinContent(i+1) << " " << events_pho2016_4->GetBinContent(i+1) << " " << rms_pho2016_4->GetBinContent(i+1) << " " << energy_ele2016_4->GetBinContent(i+1) << " " << events_ele2016_4->GetBinContent(i+1) << " " << rms_ele2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinContent(i+1) << " " << systematics2016_4->GetBinError(i+1) << " " << covering[laserResponseBins_2016[i]][4]->GetBinContent(i+1) << std::endl;
 #ifdef ALT_R9
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[5] << " " << r9Bins[5+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_5->GetBinContent(i+1) << " " << events_pho2016_5->GetBinContent(i+1) << " " << rms_pho2016_5->GetBinContent(i+1) << " " << energy_ele2016_5->GetBinContent(i+1) << " " << events_ele2016_5->GetBinContent(i+1) << " " << rms_ele2016_5->GetBinContent(i+1) << " " << systematics2016_5->GetBinContent(i+1) << " " << systematics2016_5->GetBinError(i+1) << std::endl;
 #endif
@@ -911,7 +955,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 #endif
         }
     }
-    for(int i = 5; i < 8; i++){
+    for(int i = 5; i < numEtaBins; i++){
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_0->GetBinContent(i+1) << " " << events_pho2016_0->GetBinContent(i+1) << " " << rms_pho2016_0->GetBinContent(i+1) << " " << energy_ele2016_0->GetBinContent(i+1) << " " << events_ele2016_0->GetBinContent(i+1) << " " << rms_ele2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinError(i+1) << std::endl;
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_1->GetBinContent(i+1) << " " << events_pho2016_1->GetBinContent(i+1) << " " << rms_pho2016_1->GetBinContent(i+1) << " " << energy_ele2016_1->GetBinContent(i+1) << " " << events_ele2016_1->GetBinContent(i+1) << " " << rms_ele2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinError(i+1) << std::endl;
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_2->GetBinContent(i+1) << " " << events_pho2016_2->GetBinContent(i+1) << " " << rms_pho2016_2->GetBinContent(i+1) << " " << energy_ele2016_2->GetBinContent(i+1) << " " << events_ele2016_2->GetBinContent(i+1) << " " << rms_ele2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinError(i+1) << std::endl;
@@ -938,7 +982,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
 #endif
         }
     }
-    for(int i = 5; i < 8; i++){
+    for(int i = 5; i < numEtaBins; i++){
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[0] << " " << r9Bins[0+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_0->GetBinContent(i+1) << " " << events_pho2016_0->GetBinContent(i+1) << " " << rms_pho2016_0->GetBinContent(i+1) << " " << energy_ele2016_0->GetBinContent(i+1) << " " << events_ele2016_0->GetBinContent(i+1) << " " << rms_ele2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinContent(i+1) << " " << systematics2016_0->GetBinError(i+1) << std::endl;
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[1] << " " << r9Bins[1+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_1->GetBinContent(i+1) << " " << events_pho2016_1->GetBinContent(i+1) << " " << rms_pho2016_1->GetBinContent(i+1) << " " << energy_ele2016_1->GetBinContent(i+1) << " " << events_ele2016_1->GetBinContent(i+1) << " " << rms_ele2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinContent(i+1) << " " << systematics2016_1->GetBinError(i+1) << std::endl;
         out << etaBins_center[i-1] << " " << etaBins[i] << " " << etaBins[i+1] << " " << r9Bins[2] << " " << r9Bins[2+1] << " " << _fEnergy << " " << laser_response_2016[i-1] << " " << energy_pho2016_2->GetBinContent(i+1) << " " << events_pho2016_2->GetBinContent(i+1) << " " << rms_pho2016_2->GetBinContent(i+1) << " " << energy_ele2016_2->GetBinContent(i+1) << " " << events_ele2016_2->GetBinContent(i+1) << " " << rms_ele2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinContent(i+1) << " " << systematics2016_2->GetBinError(i+1) << std::endl;
@@ -970,7 +1014,7 @@ void mySystematicsPlotter::produce_2016_2017_Plots(std::string fileName, bool co
     mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -0.02, -999);
 
     region = "combined";
-    mySystematicsPlotter::plot_year(systematics2016_0, systematics2016_1, systematics2016_2, systematics2016_3, systematics2016_4, "2016", energy, region, -0.10, 1);
+    mySystematicsPlotter::plot_year(systematics2016_0, systematics2016_1, systematics2016_2, systematics2016_3, systematics2016_4, "2016", energy, region, -999, -999);
     mySystematicsPlotter::plot_year(systematics2017_0, systematics2017_1, systematics2017_2, systematics2017_3, systematics2017_4, "2017", energy, region, -999, -999);
     mySystematicsPlotter::plot_year(systematics2018_0, systematics2018_1, systematics2018_2, systematics2018_3, systematics2018_4, "2018", energy, region, -999, -999);
 
@@ -1017,8 +1061,13 @@ void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
+#ifdef ALT_ETA
+    int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.4, 2.5};
+#else
 	int numEtaBins = 8;
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
     double xmin = 0;
     double xmax = 2.4999999;
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
@@ -1053,7 +1102,7 @@ void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
     if(yMax == -999){
         std::vector<double> myMax;
         if(region.find("EE") != std::string::npos){
-            for(int i = 5; i < 9; i++){
+            for(int i = 5; i < numEtaBins; i++){
                 myMax.push_back((double)hist0->GetBinContent(i));
                 myMax.push_back((double)hist1->GetBinContent(i));
                 myMax.push_back((double)hist2->GetBinContent(i));
@@ -1072,7 +1121,7 @@ void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
 
         }
         if(region.find("combined") != std::string::npos){
-            for(int i = 0; i < 9; i++){
+            for(int i = 0; i < numEtaBins; i++){
                 myMax.push_back((double)hist0->GetBinContent(i));
                 myMax.push_back((double)hist1->GetBinContent(i));
                 myMax.push_back((double)hist2->GetBinContent(i));
@@ -1081,12 +1130,12 @@ void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
             }
         }
         yMax = *std::max_element(myMax.begin(), myMax.end());
-        yMax *= 1.5;
+        yMax *= 1.75;
     }
     if(yMin == -999){
         std::vector<double> myMin;
         if(region.find("EE") != std::string::npos){
-            for(int i = 5; i < 9; i++){
+            for(int i = 5; i < numEtaBins; i++){
                 myMin.push_back((double)hist0->GetBinContent(i));
                 myMin.push_back((double)hist1->GetBinContent(i));
                 myMin.push_back((double)hist2->GetBinContent(i));
@@ -1104,7 +1153,7 @@ void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
             }
         }
         if(region.find("combined") != std::string::npos){
-            for(int i = 0; i < 9; i++){
+            for(int i = 0; i < numEtaBins; i++){
                 myMin.push_back((double)hist0->GetBinContent(i));
                 myMin.push_back((double)hist1->GetBinContent(i));
                 myMin.push_back((double)hist2->GetBinContent(i));
@@ -1177,8 +1226,8 @@ void mySystematicsPlotter::plot_year( TH1F * hist0, TH1F * hist1, TH1F * hist2, 
     hist0->SetAxisRange(yMin, yMax, "Y");
 
     if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
-    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
-    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, 8);}
+    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, numEtaBins);
+    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, numEtaBins);}
 
     hist0->SetLabelSize(0.035, "Y");
     hist0->SetTitleOffset(1.40, "Y");
@@ -1234,8 +1283,14 @@ void mySystematicsPlotter::plot_yearAltR9( TH1F * hist0, TH1F * hist1, TH1F * hi
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
+#ifdef ALT_ETA
+    int numEtaBins = 9;
+    double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.4, 2.5};
+#else
 	int numEtaBins = 8;
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
+
     double xmin = 0;
     double xmax = 2.4999999;
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
@@ -1296,13 +1351,13 @@ void mySystematicsPlotter::plot_yearAltR9( TH1F * hist0, TH1F * hist1, TH1F * hi
 
         }
         if(region.find("combined") != std::string::npos){
-            for(int i = 0; i < 9; i++){
-                myMax.push_back((double)hist0->GetBinContent(i));
-                myMax.push_back((double)hist1->GetBinContent(i));
-                myMax.push_back((double)hist2->GetBinContent(i));
-                myMax.push_back((double)hist3->GetBinContent(i));
-                myMax.push_back((double)hist4->GetBinContent(i));
-                myMax.push_back((double)hist5->GetBinContent(i));
+            for(int i = 0; i < numEtaBins; i++){
+                myMax.push_back((double)hist0->GetBinContent(i+1));
+                myMax.push_back((double)hist1->GetBinContent(i+1));
+                myMax.push_back((double)hist2->GetBinContent(i+1));
+                myMax.push_back((double)hist3->GetBinContent(i+1));
+                myMax.push_back((double)hist4->GetBinContent(i+1));
+                myMax.push_back((double)hist5->GetBinContent(i+1));
             }
         }
         yMax = *std::max_element(myMax.begin(), myMax.end());
@@ -1331,13 +1386,13 @@ void mySystematicsPlotter::plot_yearAltR9( TH1F * hist0, TH1F * hist1, TH1F * hi
             }
         }
         if(region.find("combined") != std::string::npos){
-            for(int i = 0; i < 9; i++){
-                myMin.push_back((double)hist0->GetBinContent(i));
-                myMin.push_back((double)hist1->GetBinContent(i));
-                myMin.push_back((double)hist2->GetBinContent(i));
-                myMin.push_back((double)hist3->GetBinContent(i));
-                myMin.push_back((double)hist4->GetBinContent(i));
-                myMin.push_back((double)hist5->GetBinContent(i));
+            for(int i = 0; i < numEtaBins; i++){
+                myMin.push_back((double)hist0->GetBinContent(i+1));
+                myMin.push_back((double)hist1->GetBinContent(i+1));
+                myMin.push_back((double)hist2->GetBinContent(i+1));
+                myMin.push_back((double)hist3->GetBinContent(i+1));
+                myMin.push_back((double)hist4->GetBinContent(i+1));
+                myMin.push_back((double)hist5->GetBinContent(i+1));
             }
         }
         yMin = *std::min_element(myMin.begin(), myMin.end());
@@ -1411,8 +1466,8 @@ void mySystematicsPlotter::plot_yearAltR9( TH1F * hist0, TH1F * hist1, TH1F * hi
     hist0->SetAxisRange(yMin, yMax, "Y");
 
     if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
-    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
-    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, 8);}
+    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, numEtaBins);
+    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, numEtaBins);}
 
     hist0->SetLabelSize(0.035, "Y");
     hist0->SetTitleOffset(1.40, "Y");
@@ -1469,8 +1524,14 @@ void mySystematicsPlotter::plot_yearEnergy( TH1F * hist0, TH1F * hist1, TH1F * h
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
 
+#ifdef ALT_ETA
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.4, 2.5};
+#else
 	int numEtaBins = 8;
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
+
     double xmin = 0;
     double xmax = 2.4999999;
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
@@ -1633,8 +1694,8 @@ void mySystematicsPlotter::plot_yearEnergy( TH1F * hist0, TH1F * hist1, TH1F * h
     hist0->SetAxisRange(yMin, yMax, "Y");
 
     if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
-    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
-    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, 8);}
+    if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, numEtaBins);
+    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, numEtaBins);}
 
     hist0->SetLabelSize(0.035, "Y");
     hist0->SetTitleOffset(1.40, "Y");
@@ -1689,9 +1750,14 @@ void mySystematicsPlotter::plot_yearEnergyAltR9( TH1F * hist0, TH1F * hist1, TH1
     int numR9bins = 5;
     double r9Bins[6] = {0, 0.8, 0.9, 0.92, 0.96, 1.00};
 #endif
-
+#ifdef ALT_ETA
+	int numEtaBins = 9;
+	double etaBins [10] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.4, 2.5};
+#else
 	int numEtaBins = 8;
 	double etaBins [9] = {0, 0.3, 0.7, 1.1, 1.4442, 1.57, 1.8, 2.1, 2.5};
+#endif
+
     double xmin = 0;
     double xmax = 2.4999999;
     if( region.find("EB") != std::string::npos ) xmax = 1.4;
@@ -1752,13 +1818,13 @@ void mySystematicsPlotter::plot_yearEnergyAltR9( TH1F * hist0, TH1F * hist1, TH1
 
         }
         if(region.find("combined") != std::string::npos){
-            for(int i = 0; i < 9; i++){
-                myMax.push_back((double)hist0->GetBinContent(i));
-                myMax.push_back((double)hist1->GetBinContent(i));
-                myMax.push_back((double)hist2->GetBinContent(i));
-                myMax.push_back((double)hist3->GetBinContent(i));
-                myMax.push_back((double)hist4->GetBinContent(i));
-                myMax.push_back((double)hist5->GetBinContent(i));
+            for(int i = 0; i < numEtaBins; i++){
+                myMax.push_back((double)hist0->GetBinContent(i+1));
+                myMax.push_back((double)hist1->GetBinContent(i+1));
+                myMax.push_back((double)hist2->GetBinContent(i+1));
+                myMax.push_back((double)hist3->GetBinContent(i+1));
+                myMax.push_back((double)hist4->GetBinContent(i+1));
+                myMax.push_back((double)hist5->GetBinContent(i+1));
             }
         }
         yMax = *std::max_element(myMax.begin(), myMax.end());
@@ -1787,13 +1853,13 @@ void mySystematicsPlotter::plot_yearEnergyAltR9( TH1F * hist0, TH1F * hist1, TH1
             }
         }
         if(region.find("combined") != std::string::npos){
-            for(int i = 0; i < 9; i++){
-                myMin.push_back((double)hist0->GetBinContent(i));
-                myMin.push_back((double)hist1->GetBinContent(i));
-                myMin.push_back((double)hist2->GetBinContent(i));
-                myMin.push_back((double)hist3->GetBinContent(i));
-                myMin.push_back((double)hist4->GetBinContent(i));
-                myMin.push_back((double)hist5->GetBinContent(i));
+            for(int i = 0; i < numEtaBins; i++){
+                myMin.push_back((double)hist0->GetBinContent(i+1));
+                myMin.push_back((double)hist1->GetBinContent(i+1));
+                myMin.push_back((double)hist2->GetBinContent(i+1));
+                myMin.push_back((double)hist3->GetBinContent(i+1));
+                myMin.push_back((double)hist4->GetBinContent(i+1));
+                myMin.push_back((double)hist5->GetBinContent(i+1));
             }
         }
         yMin = *std::min_element(myMin.begin(), myMin.end());
@@ -1872,7 +1938,7 @@ void mySystematicsPlotter::plot_yearEnergyAltR9( TH1F * hist0, TH1F * hist1, TH1
 
     if( region.find("EB") != std::string::npos ) hist0->GetXaxis()->SetRangeUser(0., 1.4);
     if( region.find("EE") != std::string::npos ) hist0->GetXaxis()->SetRange(6, 8);
-    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, 8);}
+    if( region.find("combined") != std::string::npos){ hist0->GetXaxis()->SetRange(1, numEtaBins);}
 
     hist0->SetLabelSize(0.035, "Y");
     hist0->SetTitleOffset(1.40, "Y");
@@ -1951,8 +2017,14 @@ void mySystematicsPlotter::plot_pair( TH1F * hist0, TH1F * hist1, std::string ye
     hist0->Scale(1/hist0->Integral());
     hist1->Scale(1/hist1->Integral());
 
-    hist0->Rebin(10,"",0);
-    hist1->Rebin(10, "", 0);
+    if((std::string(hist0->GetName()).find("_0_1_7") != std::string::npos) || (std::string(hist0->GetName()).find("_1_2_7") != std::string::npos)){
+        hist0->Rebin(2,"",0);
+        hist1->Rebin(2, "", 0);
+    }
+    else{
+        hist0->Rebin(10,"",0);
+        hist1->Rebin(10, "", 0);
+    }
 
     if(yMax == -999){
         std::vector<double> myMax;
