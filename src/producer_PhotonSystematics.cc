@@ -55,6 +55,7 @@ bool _flag_ratio = false;
 bool _flag_median = false;
 bool _flag_varTrunc = false;
 bool _flag_boost = true;
+bool _flag_LUT = false;
 
 int main( int argc, char **argv ){
     using namespace boost;
@@ -80,8 +81,9 @@ int main( int argc, char **argv ){
         ("rootFileOut", opts::value<std::string>(&rootFileOut), "Output root file name, default is 'fnuf_systematics_out'")
         ("rootFileOut2", opts::value<std::string>(&rootFileOut2), "Second output root file name, default is 'fnuf_systematics_out2'")
         ("outDir", opts::value<std::string>(&DIRECTORY_NAME), "Output Directory (default is 'fnuf_systematics')")
-        ("boost", opts::bool_switch(&_flag_boost), "Boost systematics to cover method uncertainties (enabled by default)")
-        ("tex", opts::bool_switch(&_flag_tex), "Use this option to turn off producing .tex tables")
+        ("LUT", opts::bool_switch(&_flag_LUT), "Turn on Look-Up Table plotter")
+        ("noBoost", opts::bool_switch(&_flag_boost), "Turn off boosted systematics to cover method uncertainties")
+        ("noTex", opts::bool_switch(&_flag_tex), "Use this option to turn off producing .tex tables")
         ("usingPions", opts::bool_switch(&usingPions), "If you are using pions instead of photons for this production, enable this option (disabled by default)")        
         ("crossCheck", opts::bool_switch(&_flag_crossChecks), "Produce crossCheck plots")
         ("trunc", opts::bool_switch(&_flag_truncate), "Activating this option will truncate plots before obtaining the mean")
@@ -204,12 +206,11 @@ int main( int argc, char **argv ){
 
 
     if( usingPions ){
-        table_producer.produce_PionLookUpTables(rootFileOut, _flag_boost);
+        //if(_flag_LUT) table_producer.produce_PionLookUpTables(rootFileOut, !_flag_boost);
         syst_plotter.produce_2016_2017_PionPlots(rootFileOut, _flag_boost);
     }
     else{
-        //table_producer.produce_LookUpTables(rootFileOut, _flag_boost);
-        std::cout << "!_flag_boost " << !_flag_boost << std::endl;
+        //if(_flag_LUT) table_producer.produce_LookUpTables(rootFileOut, !_flag_boost);
         syst_plotter.produce_2016_2017_Plots(rootFileOut, !_flag_boost);
     }
 

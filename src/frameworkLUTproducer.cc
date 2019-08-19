@@ -250,13 +250,13 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 	for(int eta = 0; eta < numEtaBins; eta++){
         if(eta != 4){
             for(int apd = 0; apd < 100; apd++){
-                double correction_0 = 1 + std::max(fabs(high_ratio_0->GetBinContent(eta+1, apd+1)), fabs(low_ratio_0->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_0->GetBinContent(eta+1,apd+1)/100.);
-                double correction_1 = 1 + std::max(fabs(high_ratio_1->GetBinContent(eta+1, apd+1)), fabs(low_ratio_1->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_1->GetBinContent(eta+1,apd+1)/100.);
-                double correction_2 = 1 + std::max(fabs(high_ratio_2->GetBinContent(eta+1, apd+1)), fabs(low_ratio_2->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_2->GetBinContent(eta+1,apd+1)/100.);
-                double correction_3 = 1 + std::max(fabs(high_ratio_3->GetBinContent(eta+1, apd+1)), fabs(low_ratio_3->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_3->GetBinContent(eta+1,apd+1)/100.);
-                double correction_4 = 1 + std::max(fabs(high_ratio_4->GetBinContent(eta+1, apd+1)), fabs(low_ratio_4->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_4->GetBinContent(eta+1,apd+1)/100.);
+                double correction_0 = 1 + fabs(high_ratio_0->GetBinContent(eta+1, apd+1))/100. + fabs(front_ratio_0->GetBinContent(eta+1,apd+1))/100.;
+                double correction_1 = 1 + fabs(high_ratio_1->GetBinContent(eta+1, apd+1))/100. + fabs(front_ratio_1->GetBinContent(eta+1,apd+1))/100.;
+                double correction_2 = 1 + fabs(high_ratio_2->GetBinContent(eta+1, apd+1))/100. + fabs(front_ratio_2->GetBinContent(eta+1,apd+1))/100.;
+                double correction_3 = 1 + fabs(high_ratio_3->GetBinContent(eta+1, apd+1))/100. + fabs(front_ratio_3->GetBinContent(eta+1,apd+1))/100.;
+                double correction_4 = 1 + fabs(high_ratio_4->GetBinContent(eta+1, apd+1))/100. + fabs(front_ratio_4->GetBinContent(eta+1,apd+1))/100.;
 #ifdef ALT_R9
-                double correction_5 = 1 + std::max(fabs(high_ratio_5->GetBinContent(eta+1, apd+1)), fabs(low_ratio_5->GetBinContent(eta+1,apd+1)))/100. + fabs(front_ratio_5->GetBinContent(eta+1,apd+1)/100.);
+                double correction_5 = 1 + fabs(high_ratio_5->GetBinContent(eta+1, apd+1))/100. + fabs(front_ratio_5->GetBinContent(eta+1,apd+1))/100.;
 #endif
                 if(!_flag_median){
                     mean1 = e_0_hists[eta][99-apd]->GetMean();
@@ -349,13 +349,13 @@ void myLookUpTableProducer::produce_LookUpTables(std::string fileName, bool corr
 #endif
 
 
-    myLookUpTableProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 2.49999, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_1, "lookUpTable_EB_R9_1", 0., 2.49999, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_2, "lookUpTable_EB_R9_2", 0., 2.49999, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_3, "lookUpTable_EB_R9_3", 0., 2.49999, -0.7, 0.7);
-    myLookUpTableProducer::plot_LookUpTable( mean_4, "lookUpTable_EB_R9_4", 0., 2.49999, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_0, "lookUpTable_EB_R9_0", 0., 2.49999, -999, -999);
+    myLookUpTableProducer::plot_LookUpTable( mean_1, "lookUpTable_EB_R9_1", 0., 2.49999, -999, -999);
+    myLookUpTableProducer::plot_LookUpTable( mean_2, "lookUpTable_EB_R9_2", 0., 2.49999, -999, -999);
+    myLookUpTableProducer::plot_LookUpTable( mean_3, "lookUpTable_EB_R9_3", 0., 2.49999, -999, -999);
+    myLookUpTableProducer::plot_LookUpTable( mean_4, "lookUpTable_EB_R9_4", 0., 2.49999, -999, -999);
 #ifdef ALT_R9
-    myLookUpTableProducer::plot_LookUpTable( mean_5, "lookUpTable_EB_R9_4", 0., 2.49999, -0.7, 0.7);
+    myLookUpTableProducer::plot_LookUpTable( mean_5, "lookUpTable_EB_R9_4", 0., 2.49999, -999, -999);
 #endif
 
     std::cout << std::endl << "[INFO] look-up tables have been produced ... " << std::endl;
@@ -397,12 +397,20 @@ void myLookUpTableProducer::plot_LookUpTable( TH2F* thisHist, std::string title,
     thisHist->SetContour(99);
     thisHist->SetAxisRange(xMin, xMax, "X");
     thisHist->SetAxisRange(0.5, 1., "Y");
+    if(zMin == -999 && zMax == -999){
+        zMin = thisHist->GetMinimum();
+        zMax = thisHist->GetMaximum();
+        std::cout << zMin << " " << zMax << std::endl;
+        zMax = 1.1*std::max(fabs(zMin), fabs(zMax));
+        zMin = -1*zMax;
+        std::cout << zMin << " " << zMax << std::endl;
+    }
     thisHist->SetAxisRange(zMin, zMax, "Z");
     thisHist->SetLabelSize(0.03, "Y");
     thisHist->SetLabelSize(0.02, "Z");
     thisHist->SetTitleSize(0.03, "Z");
     thisHist->SetTitleOffset(1.25, "Y");
-    TBox * myBox = new TBox(1.4442, 0.5, 1.57, 1.);
+    TBox * myBox = new TBox(1.4442, 0.495, 1.57, 1.005);
     myBox->SetFillStyle(3002);
     myBox->SetFillColor(kBlack);
     myBox->SetLineColor(kBlack);

@@ -27,6 +27,6 @@ thisFile = np.matrix(thisFile)
 
 for row in thisFile:
     row = np.ravel(row)
-    f.write("cms.PSet( lowBounds = cms.vdouble( %f, %f ) , upBounds = cms.vdouble( %f, %f ) , values = cms.double( 0. ) , uncertainties = cms.vdouble( %f ) ) ,\n" % (row[1], row[3], row[2], row[4], row[13]/100.))
+    f.write("cms.PSet( lowBounds = cms.vdouble( %f, %f ) , upBounds = cms.vdouble( %f, %f ) , values = cms.vdouble( 0. ) , uncertainties = cms.vdouble( %f ) ) ,\n" % (row[1], row[3], row[2], row[4], row[13]/100.))
 
 f.close()
